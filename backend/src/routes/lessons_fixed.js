@@ -3,13 +3,24 @@ const db = require('../db');
 const { cached } = require('../cache');
 const auth = require('../middleware/auth');
 
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
   const { track = 'TOPIK' } = req.query;
-  const userId = req.telegramUser?.id;
+
+  let userId = null;
+  try {
+    const initData = req.headers['x-telegram-init-data'];
+    if (initData) {
+      const params = new URLSearchParams(initData);
+      const user = JSON.parse(params.get('user') || '{}');
+      userId = user.id || null;
+    }
+  } catch (e) {}
+
   try {
     const { rows } = await db.query(
       'SELECT l.id, l.level, l.title_kr, l.title_uz, l.is_free, ' +
-      'COALESCE(p.status, \'locked\') AS status, p.score ' +
+      'COALESCE(p.status, CASE WHEN l.is_free THEN \'unlocked\' ELSE \'locked\' END) AS status, ' +
+      'p.score ' +
       'FROM lessons l ' +
       'LEFT JOIN user_progress p ON p.lesson_id = l.id AND p.user_id = ' +
       '(SELECT id FROM users WHERE telegram_id = $1) ' +
@@ -23,7 +34,7 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const cacheKey = 'lesson:' + id;

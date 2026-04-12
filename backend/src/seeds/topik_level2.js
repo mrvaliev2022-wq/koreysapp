@@ -39,7 +39,7 @@ N처럼 / N같이 — ...dek / ...day (o'xshash)
           { kr: '여러분을 알게 되어 기쁩니다.', uz: 'Sizlar bilan tanishganimdan xursandman.' },
           { kr: '저는 여기에서 공부하게 되었어요.', uz: "Men bu yerda o'qiydigan bo'ldim." },
           { kr: '저는 선생님처럼 말하고 싶어요.', uz: "Men o'qituvchidek gapirmoqchiman." },
-          { kr: '한국어를 배우게 되어서 행복해요.', uz: 'Koreys tilini o'rganib qolganim uchun baxtliman.' },
+          { kr: '한국어를 배우게 되어서 행복해요.', uz: "Koreys tilini o'rganib qolganim uchun baxtliman." },
           { kr: '친구처럼 편하게 얘기해요.', uz: "Do'stdek erkin gapiramiz." },
         ]
       },
@@ -1052,7 +1052,7 @@ Misol: 등록을 하려고 왔어요. (Ro'yxatdan o'tish uchun keldim.)
     quiz: [
       { question: "'등록을 하려고 왔어요' nimani anglatadi?", options: ["Ro'yxatdan o'tib bo'ldim", "Ro'yxatdan o'tish uchun keldim", "Ro'yxat yo'q", "Ro'yxatdan o'tmayman"], correct_index: 1 },
       { question: "'-(으)려고' qanday ma'no ifodalaydi?", options: ['...sababli', '...qilish uchun (maqsad)', '...ga qaramasdan', '...da'], correct_index: 1 },
-      { question: "'-러' faqat qaysi fe'llar bilan ishlatiladi?", options: ['Barcha fe'llar', 'Harakat fe'llari (오다, 가다)', 'Sifat fe'llar', 'Yordamchi fe'llar'], correct_index: 1 },
+      { question: "'-러' faqat qaysi fe'llar bilan ishlatiladi?", options: ["Barcha fe'llar", "Harakat fe'llari (오다, 가다)", "Sifat fe'llar", "Yordamchi fe'llar"], correct_index: 1 },
       { question: "'서류' nimani anglatadi?", options: ['ariza', 'hujjatlar', 'chek', 'pasport'], correct_index: 1 },
       { question: "'작성하다' nimani anglatadi?", options: ['topshirmoq', 'olmoq', "to'ldirmoq, yozmoq", 'kutmoq'], correct_index: 2 },
       { question: "'담당자' nimani anglatadi?", options: ['mijoz', "mas'ul xodim", 'o\'qituvchi', 'talaba'], correct_index: 1 },

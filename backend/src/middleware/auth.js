@@ -1,4 +1,4 @@
-﻿const crypto = require('crypto');
+const crypto = require('crypto');
 
 function verifyTelegramWebApp(initData, botToken) {
   const params = new URLSearchParams(initData);
@@ -6,16 +6,10 @@ function verifyTelegramWebApp(initData, botToken) {
   params.delete('hash');
   const dataCheckString = [...params.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([k, v]) => `${k}=${v}`)
+    .map(([k, v]) => k + '=' + v)
     .join('\n');
-  const secretKey = crypto
-    .createHmac('sha256', 'WebAppData')
-    .update(botToken)
-    .digest();
-  const expectedHash = crypto
-    .createHmac('sha256', secretKey)
-    .update(dataCheckString)
-    .digest('hex');
+  const secretKey = crypto.createHmac('sha256', 'WebAppData').update(botToken).digest();
+  const expectedHash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
   return expectedHash === hash;
 }
 

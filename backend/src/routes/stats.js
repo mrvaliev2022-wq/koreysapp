@@ -1,26 +1,40 @@
-﻿const router = require('express').Router();
+const router = require('express').Router();
 const db = require('../db');
-const { cached } = require('../cache');
 const auth = require('../middleware/auth');
 
-router.get('/:userId', auth, async (req, res) => {
-  const { userId } = req.params;
-
+router.post('/activate', auth, async (req, res) => {
+  const { userId, method, txId } = req.body;
   try {
-    const data = await cached(stats:\, 30, async () => {
-      const { rows } = await db.query(
-        SELECT s.*, l.xp_today, l.xp_total,
-                (SELECT COUNT(*) FROM badges WHERE user_id = \) AS badge_count
-         FROM user_stats s
-         JOIN leaderboard l ON l.user_id = s.user_id
-         WHERE s.user_id = \,
-        [userId]
-      );
-      return rows[0] || null;
-    });
+    await db.query(
+      'UPDATE users SET is_premium = true, ' +
+      'premium_until = NOW() + INTERVAL \'7 months\' WHERE id = $1',
+      [userId]
+    );
+    await db.query(
+      'INSERT INTO payments (user_id, method, status, tx_id, confirmed_at) ' +
+      'VALUES ($1, $2, \'confirmed\', $3, NOW())',
+      [userId, method, txId || null]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'DB error' });
+  }
+});
 
-    if (!data) return res.status(404).json({ error: 'Not found' });
-    res.json(data);
+router.post('/stars', async (req, res) => {
+  const { telegramId, telegramPaymentId } = req.body;
+  try {
+    await db.query(
+      'UPDATE users SET is_premium = true, ' +
+      'premium_until = NOW() + INTERVAL \'1 month\' WHERE telegram_id = $1',
+      [telegramId]
+    );
+    await db.query(
+      'INSERT INTO payments (user_id, method, amount, status, tx_id, confirmed_at) ' +
+      'SELECT id, \'stars\', 150, \'confirmed\', $1, NOW() FROM users WHERE telegram_id = $2',
+      [telegramPaymentId, telegramId]
+    );
+    res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: 'DB error' });
   }

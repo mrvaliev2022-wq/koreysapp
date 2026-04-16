@@ -1,4 +1,4 @@
-require('dotenv').config();
+﻿require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -33,6 +33,7 @@ app.use('/api/lessons', require('./routes/lessons'));
 app.use('/api/progress', require('./routes/progress'));
 app.use('/api/leaderboard', require('./routes/leaderboard'));
 app.use('/api/premium', require('./routes/premium'));
+app.use('/api/referral', require('./routes/referral'));
 app.use('/api/stats', require('./routes/stats'));
 
 app.listen(PORT, () => {

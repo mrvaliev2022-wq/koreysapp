@@ -27,4 +27,5 @@ export const api = {
   getStats:       (userId) => request(`/api/stats/${userId}`),
   activatePremium:(body)   => request('/api/premium/activate', { method: 'POST', body }),
   confirmStars:   (body)   => request('/api/premium/stars', { method: 'POST', body }),
+  getCardInfo:    ()       => request('/api/payment/card-info'),
 };

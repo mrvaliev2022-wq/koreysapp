@@ -28,6 +28,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+app.use('/api/payment', require('./routes/payment'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/lessons', require('./routes/lessons'));
 app.use('/api/progress', require('./routes/progress'));
@@ -39,3 +40,4 @@ app.use('/api/stats', require('./routes/stats'));
 app.listen(PORT, () => {
   console.log('Server running on port', PORT);
 });
+

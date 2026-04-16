@@ -10,7 +10,6 @@ const STATUS_COLOR = {
   locked:      { bg: '#F5F5F5', border: '#E0E0E0', icon: '🔒' },
 };
 
-// Hangul harflari — animatsiya uchun
 const HANGUL_CHARS = ['ㄱ','ㄴ','ㄷ','ㄹ','ㅁ','ㅂ','ㅅ','ㅇ','ㅈ','ㅎ','ㅏ','ㅓ','ㅗ','ㅜ','ㅣ'];
 
 export default function LearningPath() {
@@ -27,50 +26,62 @@ export default function LearningPath() {
 
   if (loading) return <div style={s.center}>Yuklanmoqda...</div>;
 
-  // level === 0 bo'lgan kirish darsini ajratamiz
   const introLesson = lessons.find(l => l.level === 0);
-  // Qolgan darslar
   const mainLessons = lessons.filter(l => l.level !== 0);
+
+  // TOPIK: level 1-6, har birida 10 ta dars
+  // EPS-TOPIK Variant B: L1-30 = Kitob 1, L31-60 = Kitob 2
+  const sections = track === 'TOPIK'
+    ? buildTopikSections(mainLessons)
+    : buildEpsSections(mainLessons);
+
+  const totalDone = mainLessons.filter(l => l.status === 'completed').length;
 
   return (
     <div style={s.page}>
-      {/* Header */}
       <div style={s.header}>
         <div style={s.trackLabel}>{track === 'TOPIK' ? '📚 TOPIK' : '💼 EPS-TOPIK'}</div>
-        <div style={s.count}>{mainLessons.filter(l => l.status === 'completed').length}/{mainLessons.length} dars</div>
+        <div style={s.count}>{totalDone}/{mainLessons.length} dars</div>
       </div>
 
-      {/* ── Alifbo kirish kartasi ── */}
       {introLesson && (
-        <AlphabetCard lesson={introLesson} onClick={() => nav(`/lesson/${introLesson.id}`)} />
+        <AlphabetCard lesson={introLesson} onClick={() => nav('/lesson/' + introLesson.id)} />
       )}
 
-      {/* ── Asosiy darslar ro'yxati ── */}
-      <div style={s.list}>
-        {mainLessons.map((lesson, i) => {
-          const st = STATUS_COLOR[lesson.status] || STATUS_COLOR.locked;
-          const isLocked = lesson.status === 'locked' && !user?.is_premium && !lesson.is_free;
-
-          return (
-            <button
-              key={lesson.id}
-              style={{ ...s.card, background: st.bg, border: `1.5px solid ${st.border}`,
-                       opacity: isLocked ? 0.6 : 1 }}
-              onClick={() => !isLocked && nav(`/lesson/${lesson.id}`)}
-            >
-              <div style={s.num}>{i + 1}</div>
-              <div style={s.info}>
-                <div style={s.titleKr}>{lesson.title_kr}</div>
-                <div style={s.titleUz}>{lesson.title_uz}</div>
-              </div>
-              <div style={s.statusIcon}>{st.icon}</div>
-              {lesson.score != null && lesson.status === 'completed' && (
-                <div style={s.score}>{lesson.score}%</div>
-              )}
-            </button>
-          );
-        })}
-      </div>
+      {sections.map((section) => (
+        <div key={section.title} style={s.section}>
+          <div style={s.sectionHeader}>
+            <div style={s.sectionTitle}>{section.title}</div>
+            <div style={s.sectionCount}>
+              {section.lessons.filter(l => l.status === 'completed').length}/{section.lessons.length}
+            </div>
+          </div>
+          <div style={s.list}>
+            {section.lessons.map((lesson, i) => {
+              const st = STATUS_COLOR[lesson.status] || STATUS_COLOR.locked;
+              const isLocked = lesson.status === 'locked' && !user?.is_premium && !lesson.is_free;
+              return (
+                <button
+                  key={lesson.id}
+                  style={{ ...s.card, background: st.bg, border: '1.5px solid ' + st.border,
+                           opacity: isLocked ? 0.6 : 1 }}
+                  onClick={() => !isLocked && nav('/lesson/' + lesson.id)}
+                >
+                  <div style={s.num}>{section.offset + i + 1}</div>
+                  <div style={s.info}>
+                    <div style={s.titleKr}>{lesson.title_kr}</div>
+                    <div style={s.titleUz}>{lesson.title_uz}</div>
+                  </div>
+                  <div style={s.statusIcon}>{st.icon}</div>
+                  {lesson.score != null && lesson.status === 'completed' && (
+                    <div style={s.score}>{lesson.score}%</div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
 
       {!user?.is_premium && (
         <div style={s.premBanner}>
@@ -82,11 +93,44 @@ export default function LearningPath() {
   );
 }
 
-// ── Alifbo kirish kartasi komponenti ──
+// TOPIK: Level 1 = 1-daraja, Level 2 = 2-daraja ... Level 6 = 6-daraja
+function buildTopikSections(lessons) {
+  const sections = [];
+  for (let lvl = 1; lvl <= 6; lvl++) {
+    const group = lessons.filter(l => l.level === lvl);
+    if (group.length) {
+      sections.push({
+        title: lvl + '-daraja',
+        lessons: group,
+        offset: (lvl - 1) * 10,
+      });
+    }
+  }
+  return sections;
+}
+
+// EPS-TOPIK Variant B:
+// L1-L30  = EPS-TOPIK 1 (birinchi kitob, 30 ta dars)
+// L31-L60 = EPS-TOPIK 2 (ikkinchi kitob, 30 ta dars)
+function buildEpsSections(lessons) {
+  const book1 = lessons.filter(l => l.level >= 1 && l.level <= 30)
+    .sort((a, b) => a.level - b.level);
+  const book2 = lessons.filter(l => l.level >= 31 && l.level <= 60)
+    .sort((a, b) => a.level - b.level);
+
+  const sections = [];
+  if (book1.length) {
+    sections.push({ title: 'EPS-TOPIK 1 (1-30 dars)', lessons: book1, offset: 0 });
+  }
+  if (book2.length) {
+    sections.push({ title: 'EPS-TOPIK 2 (31-60 dars)', lessons: book2, offset: 30 });
+  }
+  return sections;
+}
+
 function AlphabetCard({ lesson, onClick }) {
   const [charIdx, setCharIdx] = useState(0);
 
-  // Har 800ms da bir Hangul harfi o'zgaradi
   useEffect(() => {
     const t = setInterval(() => {
       setCharIdx(i => (i + 1) % HANGUL_CHARS.length);
@@ -98,18 +142,15 @@ function AlphabetCard({ lesson, onClick }) {
 
   return (
     <button style={s.alphaCard} onClick={onClick}>
-      {/* Chap: matn */}
       <div style={s.alphaLeft}>
         <div style={s.alphaBadge}>✨ Kirish darsi</div>
         <div style={s.alphaTitle}>Harflar</div>
         <div style={s.alphaSubtitle}>Koreys tilida</div>
         <div style={s.alphaDesc}>한글 · Hangul</div>
         <div style={s.alphaHint}>
-          {isDone ? '✅ O\'tilgan' : '▶ Boshlash — bepul'}
+          {isDone ? "✅ O'tilgan" : "▶ Boshlash — bepul"}
         </div>
       </div>
-
-      {/* O'ng: animatsiya */}
       <div style={s.alphaRight}>
         <div style={s.alphaCharBig}>{HANGUL_CHARS[charIdx]}</div>
         <div style={s.alphaCharRow}>
@@ -122,21 +163,25 @@ function AlphabetCard({ lesson, onClick }) {
           ))}
         </div>
       </div>
-
-      {/* Belgi */}
       {isDone && <div style={s.alphaDoneBadge}>✅</div>}
     </button>
   );
 }
 
 const s = {
-  page:       { padding: '16px 16px 100px', minHeight: '100vh' },
-  center:     { display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' },
-  header:     { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
-  trackLabel: { fontSize: 18, fontWeight: 700 },
-  count:      { fontSize: 13, color: '#888' },
+  page:        { padding: '16px 16px 100px', minHeight: '100vh' },
+  center:      { display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' },
+  header:      { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  trackLabel:  { fontSize: 18, fontWeight: 700 },
+  count:       { fontSize: 13, color: '#888' },
 
-  // ── Alifbo kartasi ──
+  section:     { marginBottom: 24 },
+  sectionHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                   marginBottom: 10, paddingBottom: 8,
+                   borderBottom: '2px solid #E3F2FD' },
+  sectionTitle:{ fontSize: 15, fontWeight: 700, color: '#1565C0' },
+  sectionCount:{ fontSize: 12, color: '#888', fontWeight: 600 },
+
   alphaCard: {
     width: '100%',
     display: 'flex',
@@ -161,17 +206,12 @@ const s = {
   alphaSubtitle: { fontSize: 15, fontWeight: 600, color: '#90CAF9', marginTop: 2 },
   alphaDesc:     { fontSize: 13, color: 'rgba(255,255,255,0.55)', marginTop: 4 },
   alphaHint:     { fontSize: 12, color: '#A5D6A7', marginTop: 10, fontWeight: 600 },
-
-  alphaRight:    { width: 90, display: 'flex', flexDirection: 'column',
-                   alignItems: 'center', gap: 8 },
-  alphaCharBig:  { fontSize: 52, color: '#fff', fontWeight: 800, lineHeight: 1,
-                   transition: 'all 0.3s ease' },
+  alphaRight:    { width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 },
+  alphaCharBig:  { fontSize: 52, color: '#fff', fontWeight: 800, lineHeight: 1, transition: 'all 0.3s ease' },
   alphaCharRow:  { display: 'flex', gap: 5 },
-  alphaCharSmall:{ fontSize: 14, color: '#90CAF9', fontWeight: 700,
-                   transition: 'all 0.3s ease', display: 'inline-block' },
+  alphaCharSmall:{ fontSize: 14, color: '#90CAF9', fontWeight: 700, transition: 'all 0.3s ease', display: 'inline-block' },
   alphaDoneBadge:{ position: 'absolute', top: 12, right: 12, fontSize: 20 },
 
-  // ── Asosiy darslar ──
   list:       { display: 'flex', flexDirection: 'column', gap: 10 },
   card:       { display: 'flex', alignItems: 'center', gap: 12, borderRadius: 12,
                 padding: '14px 16px', cursor: 'pointer', textAlign: 'left', width: '100%' },

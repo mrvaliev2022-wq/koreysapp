@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
 import { api } from '../api';
@@ -73,9 +73,9 @@ export default function Lesson() {
       </div>
 
       <div style={s.navRow}>
-        <button style={s.prevBtn} onClick={prev}>в†ђ Orqaga</button>
+        <button style={s.prevBtn} onClick={prev}>Orqaga</button>
         <button style={{ ...s.nextBtn, background: isAlpha ? '#0D47A1' : '#1976D2' }} onClick={next}>
-          {step === 8 ? "вњ… Testga o'tish" : 'Keyingi в†’'}
+          {step === 8 ? "Testga o'tish" : 'Keyingi в†’'}
         </button>
       </div>
     </div>
@@ -311,7 +311,7 @@ function StepContent({ step, lesson }) {
       <div>{c.notes?.map((note,i) => <div key={i} style={s.note}>рџ’Ў {note}</div>)}</div>
     );
     case 7: return <GamesStep lesson={lesson} />;
-    case 8: return <div style={s.testHint}>вњ… Test tayyor вЂ” "Testga o'tish" tugmasini bosing</div>;
+    case 8: return <div style={s.testHint}>Test tayyor вЂ” "Testga o'tish" tugmasini bosing</div>;
     default: return null;
   }
 }

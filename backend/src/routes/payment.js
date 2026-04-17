@@ -1,4 +1,6 @@
-﻿const router = require('express').Router();
+const router = require('express').Router();
+const db = require('../db');
+
 router.get('/card-info', (req, res) => {
   res.json({
     number: process.env.CARD_NUMBER || '5614681264029681',
@@ -7,4 +9,5 @@ router.get('/card-info', (req, res) => {
     amount: process.env.CARD_AMOUNT || '29 000',
   });
 });
+
 module.exports = router;

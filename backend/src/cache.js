@@ -1,15 +1,31 @@
-﻿const { createClient } = require('redis');
+const { createClient } = require('redis');
 
-const redis = createClient({ url: process.env.REDIS_URL });
+let redis = null;
 
-redis.on('error', (err) => console.error('Redis error', err));
-redis.connect();
+if (process.env.REDIS_URL && process.env.REDIS_URL !== 'placeholder') {
+  redis = createClient({ url: process.env.REDIS_URL });
+  redis.on('error', (err) => console.error('Redis error', err));
+  redis.connect().catch(console.error);
+} else {
+  console.log('Redis disabled (no REDIS_URL)');
+  redis = {
+    get: async () => null,
+    setEx: async () => {},
+    del: async () => {},
+  };
+}
 
 async function cached(key, ttlSec, fetchFn) {
-  const hit = await redis.get(key);
-  if (hit) return JSON.parse(hit);
+  try {
+    if (redis.get) {
+      const hit = await redis.get(key);
+      if (hit) return JSON.parse(hit);
+    }
+  } catch (e) {}
   const data = await fetchFn();
-  await redis.setEx(key, ttlSec, JSON.stringify(data));
+  try {
+    if (redis.setEx) await redis.setEx(key, ttlSec, JSON.stringify(data));
+  } catch (e) {}
   return data;
 }
 

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+﻿import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
 import { api } from '../api';
@@ -37,12 +37,12 @@ export default function Lesson() {
 
       {isAlpha && (
         <div style={s.alphaHeader}>
-          <span style={s.alphaHeaderIcon}>한글</span>
+          <span style={s.alphaHeaderIcon}>н•њкёЂ</span>
           <div style={{ flex: 1 }}>
             <div style={s.alphaHeaderTitle}>Harflar</div>
             <div style={s.alphaHeaderSub}>Koreys tilida</div>
           </div>
-          <span style={s.alphaHeaderFree}>✨ Bepul</span>
+          <span style={s.alphaHeaderFree}>вњЁ Bepul</span>
         </div>
       )}
 
@@ -57,7 +57,7 @@ export default function Lesson() {
             style={{ ...s.pill,
               ...(i === step ? (isAlpha ? s.pillActiveAlpha : s.pillActive) : {}),
               ...(i < step   ? s.pillDone : {}) }}>
-            {i < step ? '✓' : i + 1}
+            {i < step ? 'вњ“' : i + 1}
           </div>
         ))}
       </div>
@@ -73,16 +73,16 @@ export default function Lesson() {
       </div>
 
       <div style={s.navRow}>
-        <button style={s.prevBtn} onClick={prev}>← Orqaga</button>
+        <button style={s.prevBtn} onClick={prev}>в†ђ Orqaga</button>
         <button style={{ ...s.nextBtn, background: isAlpha ? '#0D47A1' : '#1976D2' }} onClick={next}>
-          {step === 8 ? "✅ Testga o'tish" : 'Keyingi →'}
+          {step === 8 ? "вњ… Testga o'tish" : 'Keyingi в†’'}
         </button>
       </div>
     </div>
   );
 }
 
-// ── Alifbo 9 bosqich ──────────────────────────────────
+// в”Ђв”Ђ Alifbo 9 bosqich в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function AlphabetStepContent({ step, lesson }) {
   const c  = lesson.content || {};
   const ad = c.alphabet_data || {};
@@ -91,27 +91,27 @@ function AlphabetStepContent({ step, lesson }) {
     case 0: return (
       <div>
         <div style={a.heroBanner}>
-          <div style={a.heroChar}>한글</div>
-          <div style={a.heroTitle}>Harflar — Koreys tilida</div>
-          <div style={a.heroSub}>Hangul · 1443-yil · Sejong the Great</div>
+          <div style={a.heroChar}>н•њкёЂ</div>
+          <div style={a.heroTitle}>Harflar вЂ” Koreys tilida</div>
+          <div style={a.heroSub}>Hangul В· 1443-yil В· Sejong the Great</div>
         </div>
         <AudioText text={c.topic?.kr} audioUrl={lesson.audio_urls?.topic} />
         <div style={s.uzText}>{c.topic?.uz}</div>
         <div style={a.tipBox}>
-          💡 Hangul dunyodagi eng ilmiy yozuv tizimlaridan biri. O'qilishi = yozilishi.
+          рџ’Ў Hangul dunyodagi eng ilmiy yozuv tizimlaridan biri. O'qilishi = yozilishi.
         </div>
       </div>
     );
 
     case 1: return (
       <div>
-        <div style={a.secTitle}>🔤 Asosiy unlilar — 모음</div>
+        <div style={a.secTitle}>рџ”¤ Asosiy unlilar вЂ” лЄЁмќЊ</div>
         <div style={a.charGrid}>
           {(ad.vowels_basic||[]).map((v,i) => (
             <CharCard key={i} data={v} audioUrl={lesson.audio_urls?.[`vocab_${i}`]} />
           ))}
         </div>
-        <div style={a.secTitle}>➕ Qo'shma unlilar</div>
+        <div style={a.secTitle}>вћ• Qo'shma unlilar</div>
         <div style={a.charGrid}>
           {(ad.vowels_compound||[]).map((v,i) => (
             <CharCard key={i} data={v} audioUrl={lesson.audio_urls?.[`vocab_${6+i}`]} small />
@@ -122,53 +122,53 @@ function AlphabetStepContent({ step, lesson }) {
 
     case 2: return (
       <div>
-        <div style={a.secTitle}>🔤 Asosiy undoshlar — 자음</div>
+        <div style={a.secTitle}>рџ”¤ Asosiy undoshlar вЂ” мћђмќЊ</div>
         <div style={a.charGrid}>
           {(ad.consonants_basic||[]).map((v,i) => (
             <CharCard key={i} data={v} audioUrl={lesson.audio_urls?.[`grammar_${i}`]} />
           ))}
         </div>
         <div style={a.noteBox}>
-          ⚠️ <strong>ㅇ</strong> so'z boshida o'qilmaydi: 아 = "a"<br/>
-          So'z oxirida "ng" o'qiladi: 방 = "bang"
+          вљ пёЏ <strong>г…‡</strong> so'z boshida o'qilmaydi: м•„ = "a"<br/>
+          So'z oxirida "ng" o'qiladi: л°© = "bang"
         </div>
       </div>
     );
 
     case 3: return (
       <div>
-        <div style={a.secTitle}>💪 Kuchli undoshlar — 쌍자음</div>
+        <div style={a.secTitle}>рџ’Є Kuchli undoshlar вЂ” мЊЌмћђмќЊ</div>
         <div style={a.charGrid}>
           {(ad.consonants_strong||[]).map((v,i) => (
             <CharCard key={i} data={v} accent="#B71C1C" />
           ))}
         </div>
         <div style={a.noteBox}>
-          ⚡ Kuchli undoshlar ikki marta bosim bilan aytiladi. 빵 (ppang) = non
+          вљЎ Kuchli undoshlar ikki marta bosim bilan aytiladi. л№µ (ppang) = non
         </div>
-        <div style={a.secTitle}>💨 Aspiratsiyali — 거센소리</div>
+        <div style={a.secTitle}>рџ’Ё Aspiratsiyali вЂ” к±°м„јм†Њл¦¬</div>
         <div style={a.charGrid}>
           {(ad.consonants_aspirated||[]).map((v,i) => (
             <CharCard key={i} data={v} accent="#1565C0" />
           ))}
         </div>
         <div style={a.noteBox}>
-          💨 Aspiratsiyali — nafas chiqarib aytiladi. 코 (kʰo) = burun
+          рџ’Ё Aspiratsiyali вЂ” nafas chiqarib aytiladi. мЅ” (kК°o) = burun
         </div>
       </div>
     );
 
     case 4: return (
       <div>
-        <div style={a.secTitle}>🧩 Bo'g'in tizimi</div>
+        <div style={a.secTitle}>рџ§© Bo'g'in tizimi</div>
         <div style={a.syllableRule}>
-          <span style={a.syllableBox}>자음</span>
+          <span style={a.syllableBox}>мћђмќЊ</span>
           <span style={a.plus}>+</span>
-          <span style={a.syllableBox}>모음</span>
+          <span style={a.syllableBox}>лЄЁмќЊ</span>
           <span style={a.plus}>=</span>
-          <span style={{ ...a.syllableBox, background: '#0D47A1', color: '#fff' }}>음절</span>
+          <span style={{ ...a.syllableBox, background: '#0D47A1', color: '#fff' }}>мќЊм €</span>
         </div>
-        <div style={a.secTitle}>📌 Ochiq bo'g'inlar</div>
+        <div style={a.secTitle}>рџ“Њ Ochiq bo'g'inlar</div>
         <div style={a.syllableList}>
           {(ad.syllable_examples||[]).map((ex,i) => (
             <div key={i} style={a.syllableRow}>
@@ -178,7 +178,7 @@ function AlphabetStepContent({ step, lesson }) {
             </div>
           ))}
         </div>
-        <div style={a.secTitle}>📌 받침 — Oxirgi undosh</div>
+        <div style={a.secTitle}>рџ“Њ л°›м№Ё вЂ” Oxirgi undosh</div>
         <div style={a.batchimGrid}>
           {(ad.batchim_examples||[]).map((ex,i) => (
             <div key={i} style={a.batchimCard}>
@@ -194,7 +194,7 @@ function AlphabetStepContent({ step, lesson }) {
 
     case 5: return (
       <div>
-        <div style={a.secTitle}>📝 Asosiy so'zlar</div>
+        <div style={a.secTitle}>рџ“ќ Asosiy so'zlar</div>
         {c.vocabulary?.map((v,i) => (
           <div key={i} style={s.vocRow}>
             <AudioText text={v.kr} audioUrl={lesson.audio_urls?.[`vocab_${i}`]} small />
@@ -207,12 +207,12 @@ function AlphabetStepContent({ step, lesson }) {
 
     case 6: return (
       <div>
-        <div style={a.secTitle}>💡 Muhim eslatmalar</div>
+        <div style={a.secTitle}>рџ’Ў Muhim eslatmalar</div>
         {c.notes?.map((note,i) => (
-          <div key={i} style={s.note}>💡 {note}</div>
+          <div key={i} style={s.note}>рџ’Ў {note}</div>
         ))}
         <div style={a.tipBox}>
-          🎯 Har kuni 10 daqiqa ovoz chiqarib o'qing. Tezlik emas — to'g'rilik muhim!
+          рџЋЇ Har kuni 10 daqiqa ovoz chiqarib o'qing. Tezlik emas вЂ” to'g'rilik muhim!
         </div>
       </div>
     );
@@ -221,9 +221,9 @@ function AlphabetStepContent({ step, lesson }) {
 
     case 8: return (
       <div style={s.testHint}>
-        ✅ Hangul testiga tayyor!
+        вњ… Hangul testiga tayyor!
         <span style={{ fontSize:14, color:'#555', fontWeight:400, marginTop:8, display:'block' }}>
-          7 ta savol — Hangul asoslari
+          7 ta savol вЂ” Hangul asoslari
         </span>
       </div>
     );
@@ -231,7 +231,7 @@ function AlphabetStepContent({ step, lesson }) {
   }
 }
 
-// ── Harf kartochkasi ──────────────────────────────────
+// в”Ђв”Ђ Harf kartochkasi в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function CharCard({ data, audioUrl, accent = '#1565C0', small }) {
   function play() { if (audioUrl) new Audio(audioUrl).play().catch(()=>{}); }
   return (
@@ -240,12 +240,12 @@ function CharCard({ data, audioUrl, accent = '#1565C0', small }) {
       <div style={a.charSound}>[{data.sound}]</div>
       <div style={a.charExample}>{data.example_kr}</div>
       <div style={a.charMeaning}>{data.example_uz}</div>
-      {audioUrl && <div style={a.charAudio}>🔊</div>}
+      {audioUrl && <div style={a.charAudio}>рџ”Љ</div>}
     </div>
   );
 }
 
-// ── Oddiy dars bosqichlari ────────────────────────────
+// в”Ђв”Ђ Oddiy dars bosqichlari в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function StepContent({ step, lesson }) {
   const c = lesson.content || {};
   switch (step) {
@@ -308,27 +308,27 @@ function StepContent({ step, lesson }) {
       </div>
     );
     case 6: return (
-      <div>{c.notes?.map((note,i) => <div key={i} style={s.note}>💡 {note}</div>)}</div>
+      <div>{c.notes?.map((note,i) => <div key={i} style={s.note}>рџ’Ў {note}</div>)}</div>
     );
     case 7: return <GamesStep lesson={lesson} />;
-    case 8: return <div style={s.testHint}>✅ Test tayyor — "Testga o'tish" tugmasini bosing</div>;
+    case 8: return <div style={s.testHint}>вњ… Test tayyor вЂ” "Testga o'tish" tugmasini bosing</div>;
     default: return null;
   }
 }
 
-// ── AudioText ────────────────────────────────────────
+// в”Ђв”Ђ AudioText в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function AudioText({ text, audioUrl, small }) {
   function play() { if (audioUrl) new Audio(audioUrl).play().catch(()=>{}); }
   return (
     <div style={{ display:'flex', alignItems:'center', gap:8,
                   cursor: audioUrl ? 'pointer' : 'default' }} onClick={play}>
       <span style={{ ...s.krText, fontSize: small ? 15 : undefined }}>{text}</span>
-      {audioUrl && <span style={s.playBtn}>🔊</span>}
+      {audioUrl && <span style={s.playBtn}>рџ”Љ</span>}
     </div>
   );
 }
 
-// ── STYLES ───────────────────────────────────────────
+// в”Ђв”Ђ STYLES в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 const s = {
   page:            { padding:'12px 16px 90px', minHeight:'100vh', userSelect:'none' },
   center:          { display:'flex', alignItems:'center', justifyContent:'center', height:'100vh' },
@@ -361,7 +361,7 @@ const s = {
   playBtn:         { fontSize:16, opacity:0.7 },
   testHint:        { textAlign:'center', padding:'60px 20px', fontSize:18,
                      color:'#2E7D32', fontWeight:600, lineHeight:1.8 },
-  navRow:          { position:'fixed', bottom:0, left:0, right:0, display:'flex', gap:8,
+  navRow:          { position:'fixed', bottom:'70px', left:0, right:0, display:'flex', gap:8,
                      padding:'12px 16px', background:'#fff', borderTop:'1px solid #EEE' },
   prevBtn:         { flex:1, padding:14, border:'1.5px solid #E0E0E0', borderRadius:12,
                      background:'#fff', fontSize:15, cursor:'pointer', fontWeight:500 },
@@ -424,3 +424,4 @@ const a = {
                   background:'#FFF3E0', borderRadius:6, padding:'2px 6px',
                   marginTop:6, display:'inline-block' },
 };
+

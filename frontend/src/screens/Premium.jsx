@@ -133,7 +133,7 @@ export default function Premium() {
           <div style={s.refHero}>
             <div style={s.refIcon}>👥</div>
             <div style={s.refTitle}>3 do'st = Bepul Premium!</div>
-            <div style={s.refSub}>Do'stlaringiz Premium sotib olsa, sizga 7 oylik Premium bepul beriladi</div>
+            <div style={s.refSub}>Do'stlaringiz Premium sotib olsa, sizga 4 oylik Premium bepul beriladi</div>
           </div>
           <div style={s.refSteps}>
             {["Dostlaringizga link yuboring", "Ular Premium sotib olsin", "Sizga bepul Premium beriladi!"].map((t, i) => (
@@ -166,7 +166,10 @@ const s = {
   heroBubble: { position: 'absolute', width: 80, height: 80, borderRadius: '50%', background: 'radial-gradient(circle,rgba(253,224,71,0.15),transparent)', top: -15, right: -15, pointerEvents: 'none' },
   crown: { fontSize: 26, marginBottom: 6 },
   heroTitle: { fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 3 },
-  heroSub: { fontSize: 11, color: 'rgba(255,255,255,0.45)', marginBottom: 12 },
+  heroSub: { fontSize: 11, color: 'rgba(255,255,255,0.45)', marginBottom: 10 },
+  heroPriceBadge: { display: 'inline-flex', alignItems: 'center', gap: 8, background: 'linear-gradient(90deg,rgba(253,224,71,0.25),rgba(163,230,53,0.2))', border: '1.5px solid rgba(253,224,71,0.4)', borderRadius: 12, padding: '8px 14px', marginTop: 4 },
+  heroPrice: { fontSize: 20, fontWeight: 900, color: '#fde047', letterSpacing: '-0.5px' },
+  heroDuration: { fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.1)', borderRadius: 8, padding: '3px 8px' },
   feats: { display: 'flex', flexDirection: 'column', gap: 6 },
   feat: { display: 'flex', alignItems: 'center', gap: 8 },
   featDot: { width: 7, height: 7, borderRadius: '50%', flexShrink: 0 },
@@ -181,7 +184,9 @@ const s = {
   payIco: { width: 34, height: 34, borderRadius: 10, background: 'rgba(219,234,254,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 },
   payTitle: { fontSize: 13, fontWeight: 700, color: '#1e293b' },
   paySub: { fontSize: 9, color: '#94a3b8', marginTop: 1 },
-  payPrice: { marginLeft: 'auto', fontSize: 13, fontWeight: 800, color: '#2563eb' },
+  payPriceWrap: { marginLeft: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 },
+  payPrice: { fontSize: 14, fontWeight: 900, color: '#2563eb' },
+  payDuration: { fontSize: 9, fontWeight: 700, background: 'rgba(219,234,254,0.9)', color: '#2563eb', borderRadius: 6, padding: '2px 6px' },
 
   bankCard: { background: 'linear-gradient(135deg,#1d4ed8,#0ea5e9)', borderRadius: 14, padding: '13px 15px', marginBottom: 10, position: 'relative', overflow: 'hidden' },
   bankBubble: { position: 'absolute', width: 60, height: 60, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', top: -15, right: -10, pointerEvents: 'none' },

@@ -23,7 +23,7 @@ bot.command('premium', (ctx) =>
     '• Barcha 127+ dars\n' +
     '• Kuniga 6 ta dars\n' +
     '• Streak Freeze 10 kun\n\n' +
-    '💳 *Narx:* 29,000 so\'m / 7 oy\n' +
+    '💳 *Narx:* 29,000 so\'m / 4 oy\n' +
     '⭐ *Telegram Stars:* 150 Stars\n\n' +
     'To\'lovni app ichida amalga oshiring 👇',
     { parse_mode: 'Markdown',

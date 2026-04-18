@@ -7,7 +7,7 @@ router.post('/admin-activate', async (req, res) => {
     return res.status(403).json({ error: 'Forbidden' });
   }
   const { telegramId, method, months } = req.body;
-  const m = parseInt(months) || 7;
+  const m = parseInt(months) || 4;
   try {
     await db.query(
       'INSERT INTO users (telegram_id, name, username) VALUES ($1, $2, $3) ON CONFLICT (telegram_id) DO NOTHING',

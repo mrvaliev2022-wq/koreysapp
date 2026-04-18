@@ -10,203 +10,208 @@ export default function Premium() {
   const nav = useNavigate();
   const [cardInfo, setCardInfo] = useState(null);
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState('card');
+  const [tab, setTab] = useState('card');
 
   useEffect(() => {
-    api.getCardInfo().then(setCardInfo).catch(() => {
-      setCardInfo({
-        number: '8600 1234 5678 9012',
-        owner: 'Valiev M.',
-        bank: 'Humo / Uzcard',
-        amount: '29 000',
-      });
-    });
+    api.getCardInfo().then(setCardInfo).catch(() => setCardInfo({ number: '5614681264029681', owner: 'V***** O**** M.', bank: 'Uzcard', amount: '29 000' }));
   }, []);
 
   function copyCard() {
-    const num = cardInfo?.number || '';
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(num.replace(/\s/g, ''));
-    }
+    if (navigator.clipboard) navigator.clipboard.writeText((cardInfo?.number || '').replace(/\s/g, ''));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
 
   function openBot() {
-    const botUrl = 'https://t.me/koreystili_topikkaBot';
-    if (tg?.openTelegramLink) {
-      tg.openTelegramLink(botUrl);
-    } else {
-      window.open(botUrl, '_blank');
-    }
+    const url = 'https://t.me/koreystili_topikkaBot';
+    if (tg?.openTelegramLink) tg.openTelegramLink(url);
+    else window.open(url, '_blank');
   }
 
-  function shareReferral() {
-    const refLink = 'https://t.me/koreystili_topikkaBot?start=ref_' + (user?.telegram_id || '');
-    const text = "KoreysApp bilan koreys tilini organamiz! Siz ham boshlang: " + refLink;
-    if (tg?.openTelegramLink) {
-      tg.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(refLink) + '&text=' + encodeURIComponent(text));
-    }
+  function shareRef() {
+    const link = 'https://t.me/koreystili_topikkaBot?start=ref_' + (user?.telegram_id || '');
+    if (tg?.openTelegramLink) tg.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(link));
   }
+
+  const tabs = ['card', 'stars', 'ref'];
+  const tabLabels = ['💳 Karta', '⭐ Stars', '👥 Referral'];
 
   return (
     <div style={s.page}>
-      <div style={s.crown}>👑</div>
-      <div style={s.title}>Premium</div>
-      <div style={s.sub}>Barcha imkoniyatlarni oching</div>
+      <div style={s.bubble1} /><div style={s.bubble2} /><div style={s.bubble3} />
 
-      <div style={s.features}>
-        {['127+ dars — TOPIK va EPS-TOPIK', 'Audio talaffuz — har bir so\'z', 'Grammatika tushuntirishlari', 'Streak Freeze 10 kun'].map((f) => (
-          <div key={f} style={s.feature}>✅ {f}</div>
-        ))}
+      {/* Hero */}
+      <div style={s.hero}>
+        <div style={s.heroStripe} />
+        <div style={s.heroBubble} />
+        <div style={s.crown}>👑</div>
+        <div style={s.heroTitle}>Premium oling!</div>
+        <div style={s.heroSub}>127+ dars, audio, grammatika, streak freeze</div>
+        <div style={s.feats}>
+          {[
+            { dot: '#4ade80', text: '127+ dars — TOPIK va EPS-TOPIK' },
+            { dot: '#fde047', text: 'Audio talaffuz — har bir so\'z' },
+            { dot: '#c4b5fd', text: 'Grammatika tushuntirishlari' },
+            { dot: '#93c5fd', text: 'Streak Freeze 10 kun' },
+          ].map((f, i) => (
+            <div key={i} style={s.feat}>
+              <div style={{ ...s.featDot, background: f.dot }} />
+              <span style={s.featText}>{f.text}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Tabs */}
       <div style={s.tabs}>
-        <button style={{ ...s.tab, ...(activeTab === 'card' ? s.tabActive : {}) }}
-          onClick={() => setActiveTab('card')}>💳 Karta</button>
-        <button style={{ ...s.tab, ...(activeTab === 'stars' ? s.tabActive : {}) }}
-          onClick={() => setActiveTab('stars')}>⭐ Stars</button>
-        <button style={{ ...s.tab, ...(activeTab === 'ref' ? s.tabActive : {}) }}
-          onClick={() => setActiveTab('ref')}>👥 Referral</button>
+        {tabs.map((t, i) => (
+          <button key={t} style={{ ...s.tab, ...(tab === t ? s.tabActive : {}) }} onClick={() => setTab(t)}>
+            {tabLabels[i]}
+          </button>
+        ))}
       </div>
 
-      {/* KARTA TO'LOV */}
-      {activeTab === 'card' && (
-        <div style={s.method}>
-          <div style={s.methodHeader}>
-            <div style={s.methodTitle}>Uzcard / Humo orqali</div>
-            <div style={s.methodPrice}>{cardInfo?.amount || '29 000'} so'm</div>
-          </div>
-
-          {/* Karta */}
-          <div style={s.card}>
-            <div style={s.cardBank}>{cardInfo?.bank || 'Humo / Uzcard'}</div>
-            <div style={s.cardNumber}>{cardInfo?.number || '8600 •••• •••• ••••'}</div>
-            <div style={s.cardOwner}>{cardInfo?.owner || 'Karta egasi'}</div>
-          </div>
-
-          {/* Nusxalash tugmasi */}
-          <button style={s.copyBtn} onClick={copyCard}>
-            {copied ? '✅ Nusxalandi!' : '📋 Karta raqamini nusxalash'}
-          </button>
-
-          {/* Ko'rsatma */}
-          <div style={s.instruction}>
-            <div style={s.instrTitle}>📌 Qanday to'lash kerak?</div>
-            <div style={s.instrStep}>1️⃣ Yuqoridagi karta raqamini nusxalang</div>
-            <div style={s.instrStep}>2️⃣ Humo yoki Click/Payme orqali <strong>{cardInfo?.amount || '29 000'} so'm</strong> o'tkazing</div>
-            <div style={s.instrStep}>3️⃣ To'lov chekining screenshotini oling</div>
-            <div style={s.instrStep}>4️⃣ Botga screenshotni yuboring</div>
-          </div>
-
-          {/* Asosiy tugma */}
-          <div style={s.alertBox}>
-            <div style={s.alertText}>
-              Ushbu kartaga pulni o'tkazing va Screenshot jo'nating!
+      {/* CARD TAB */}
+      {tab === 'card' && (
+        <div style={s.payCard}>
+          <div style={s.payHead}>
+            <div style={s.payIco}>💳</div>
+            <div>
+              <div style={s.payTitle}>Uzcard / Humo orqali</div>
+              <div style={s.paySub}>Admin 5-30 daqiqada tasdiqlaydi</div>
             </div>
+            <div style={s.payPrice}>{cardInfo?.amount || '29 000'} so'm</div>
           </div>
 
-          <button style={s.btnCard} onClick={openBot}>
-            📸 Screenshotni botga yuborish
-          </button>
+          {/* Bank card */}
+          <div style={s.bankCard}>
+            <div style={s.bankBubble} />
+            <div style={s.bankName}>{cardInfo?.bank || 'Uzcard'}</div>
+            <div style={s.bankNum}>{cardInfo?.number || '5614 6812 6402 9681'}</div>
+            <div style={s.bankOwner}>{cardInfo?.owner || 'V***** O**** M.'}</div>
+          </div>
 
-          <div style={s.note}>Admin 5-30 daqiqa ichida Premium ochadi</div>
+          {/* Alert */}
+          <div style={s.alert}>
+            <div style={s.alertText}>Ushbu kartaga pulni o'tkazing va Screenshot jo'nating!</div>
+          </div>
+
+          <div style={s.steps}>
+            {['Karta raqamini nusxalang', cardInfo?.amount + ' so\'m o\'tkazing', 'To\'lov chekini screenshot oling', 'Botga screenshot yuboring'].map((step, i) => (
+              <div key={i} style={s.step}>
+                <div style={s.stepNum}>{i + 1}</div>
+                <div style={s.stepText}>{step}</div>
+              </div>
+            ))}
+          </div>
+
+          <button style={s.copyBtn} onClick={copyCard}>
+            {copied ? '✓ Nusxalandi!' : '📋 Karta raqamini nusxalash'}
+          </button>
+          <button style={s.mainBtn} onClick={openBot}>📸 Screenshotni botga yuborish</button>
         </div>
       )}
 
-      {/* TELEGRAM STARS */}
-      {activeTab === 'stars' && (
-        <div style={s.method}>
-          <div style={s.methodHeader}>
-            <div style={s.methodTitle}>Telegram Stars</div>
-            <div style={s.methodPrice}>150 ⭐</div>
+      {/* STARS TAB */}
+      {tab === 'stars' && (
+        <div style={s.payCard}>
+          <div style={{ ...s.starsHero, background: 'linear-gradient(135deg,rgba(253,224,71,0.15),rgba(245,158,11,0.1))' }}>
+            <div style={s.starsIcon}>⭐</div>
+            <div style={s.starsTitle}>Telegram Stars</div>
+            <div style={s.starsPrice}>150 ⭐</div>
+            <div style={s.starsSub}>To'lovdan so'ng Premium avtomatik faollashadi</div>
           </div>
-          <div style={s.starsInfo}>
-            Telegram Stars orqali to'lash — darhol faollashadi, admin kutish shart emas!
-          </div>
-          <button style={s.btnStar} onClick={openBot}>
+          <button style={{ ...s.mainBtn, background: 'linear-gradient(90deg,#f59e0b,#fde047)', color: '#111' }} onClick={openBot}>
             ⭐ Botda Stars bilan to'lash
           </button>
-          <div style={s.note}>To'lovdan so'ng Premium avtomatik faollashadi</div>
         </div>
       )}
 
-      {/* REFERRAL */}
-      {activeTab === 'ref' && (
-        <div style={s.method}>
-          <div style={s.methodHeader}>
-            <div style={s.methodTitle}>Do'stlarni taklif qiling</div>
-            <div style={s.methodPrice}>Bepul!</div>
+      {/* REFERRAL TAB */}
+      {tab === 'ref' && (
+        <div style={s.payCard}>
+          <div style={s.refHero}>
+            <div style={s.refIcon}>👥</div>
+            <div style={s.refTitle}>3 do'st = Bepul Premium!</div>
+            <div style={s.refSub}>Do'stlaringiz Premium sotib olsa, sizga 7 oylik Premium bepul beriladi</div>
           </div>
-          <div style={s.refInfo}>
-            <div style={s.refStep}>👥 3 ta do'stingizni taklif qiling</div>
-            <div style={s.refStep}>💳 Ular Premium sotib olsin</div>
-            <div style={s.refStep}>🎁 Sizga 7 oy bepul Premium!</div>
+          <div style={s.refSteps}>
+            {["Dostlaringizga link yuboring", "Ular Premium sotib olsin", "Sizga bepul Premium beriladi!"].map((t, i) => (
+              <div key={i} style={s.refStep}>
+                <div style={{ ...s.refStepNum, background: ['rgba(219,234,254,0.8)', 'rgba(220,252,231,0.8)', 'rgba(237,233,254,0.8)'][i], color: ['#2563eb', '#15803d', '#7c3aed'][i] }}>{i + 1}</div>
+                <div style={s.refStepText}>{t}</div>
+              </div>
+            ))}
           </div>
-          <button style={s.btnRef} onClick={shareReferral}>
-            🔗 Do'stlarga havola yuborish
+          <button style={{ ...s.mainBtn, background: 'linear-gradient(90deg,#4ade80,#22c55e)', color: '#111' }} onClick={shareRef}>
+            🔗 Havolani ulashish
           </button>
-          <div style={s.note}>Botda /referral — holatingizni koring</div>
+          <button style={s.copyBtn} onClick={openBot}>Botda holatni tekshirish</button>
         </div>
       )}
     </div>
   );
 }
 
+const glass = { background: 'rgba(255,255,255,0.62)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1.5px solid rgba(255,255,255,0.9)' };
+
 const s = {
-  page:       { padding: '20px 16px 60px', minHeight: '100vh', textAlign: 'center' },
-  crown:      { fontSize: 50, marginBottom: 6 },
-  title:      { fontSize: 26, fontWeight: 800, color: '#1a1a1a', marginBottom: 4 },
-  sub:        { fontSize: 14, color: '#666', marginBottom: 16 },
-  features:   { display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 20, textAlign: 'left',
-                background: '#F8F9FF', borderRadius: 12, padding: '12px 14px' },
-  feature:    { fontSize: 14, color: '#333' },
+  page: { padding: '16px 16px 100px', minHeight: '100vh', background: 'linear-gradient(160deg,#f0f4ff,#e8f4ff 50%,#f0f0ff)', position: 'relative', overflow: 'hidden' },
+  bubble1: { position: 'absolute', width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle,rgba(147,197,253,0.25),transparent)', top: -50, right: -50, pointerEvents: 'none' },
+  bubble2: { position: 'absolute', width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle,rgba(134,239,172,0.2),transparent)', top: 300, left: -40, pointerEvents: 'none' },
+  bubble3: { position: 'absolute', width: 90, height: 90, borderRadius: '50%', background: 'radial-gradient(circle,rgba(196,181,253,0.2),transparent)', bottom: 200, right: -20, pointerEvents: 'none' },
 
-  tabs:       { display: 'flex', gap: 8, marginBottom: 16 },
-  tab:        { flex: 1, padding: '10px 0', border: '1.5px solid #E0E0E0', borderRadius: 10,
-                background: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: '#666' },
-  tabActive:  { background: '#1976D2', color: '#fff', border: '1.5px solid #1976D2' },
+  hero: { borderRadius: 22, padding: '16px 16px 18px', marginBottom: 14, position: 'relative', overflow: 'hidden', zIndex: 1, background: 'linear-gradient(135deg,rgba(17,17,17,0.88),rgba(26,26,46,0.88))', border: '1.5px solid rgba(255,255,255,0.15)' },
+  heroStripe: { position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg,#3b82f6,#4ade80,#fde047,#a78bfa)', borderRadius: '22px 22px 0 0' },
+  heroBubble: { position: 'absolute', width: 80, height: 80, borderRadius: '50%', background: 'radial-gradient(circle,rgba(253,224,71,0.15),transparent)', top: -15, right: -15, pointerEvents: 'none' },
+  crown: { fontSize: 26, marginBottom: 6 },
+  heroTitle: { fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 3 },
+  heroSub: { fontSize: 11, color: 'rgba(255,255,255,0.45)', marginBottom: 12 },
+  feats: { display: 'flex', flexDirection: 'column', gap: 6 },
+  feat: { display: 'flex', alignItems: 'center', gap: 8 },
+  featDot: { width: 7, height: 7, borderRadius: '50%', flexShrink: 0 },
+  featText: { fontSize: 11, color: 'rgba(255,255,255,0.8)' },
 
-  method:     { border: '1.5px solid #E8EBFF', borderRadius: 14, padding: 16, textAlign: 'left' },
-  methodHeader:{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
-  methodTitle:{ fontSize: 15, fontWeight: 700, color: '#1a1a1a' },
-  methodPrice:{ fontSize: 15, fontWeight: 700, color: '#1976D2' },
+  tabs: { display: 'flex', gap: 7, marginBottom: 12, position: 'relative', zIndex: 1 },
+  tab: { flex: 1, padding: '9px 0', borderRadius: 12, background: 'rgba(255,255,255,0.55)', border: '1.5px solid rgba(255,255,255,0.8)', fontSize: 11, fontWeight: 700, cursor: 'pointer', color: '#64748b' },
+  tabActive: { background: 'linear-gradient(135deg,#3b82f6,#0ea5e9)', border: '1.5px solid rgba(59,130,246,0.3)', color: '#fff' },
 
-  card:       { background: 'linear-gradient(135deg, #1565C0, #0D47A1)',
-                borderRadius: 14, padding: '18px 20px', marginBottom: 12, color: '#fff' },
-  cardBank:   { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginBottom: 12, fontWeight: 600 },
-  cardNumber: { fontSize: 20, fontWeight: 800, letterSpacing: 2, marginBottom: 12 },
-  cardOwner:  { fontSize: 13, color: 'rgba(255,255,255,0.8)' },
+  payCard: { ...glass, borderRadius: 18, padding: '14px', position: 'relative', zIndex: 1 },
+  payHead: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 },
+  payIco: { width: 34, height: 34, borderRadius: 10, background: 'rgba(219,234,254,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 },
+  payTitle: { fontSize: 13, fontWeight: 700, color: '#1e293b' },
+  paySub: { fontSize: 9, color: '#94a3b8', marginTop: 1 },
+  payPrice: { marginLeft: 'auto', fontSize: 13, fontWeight: 800, color: '#2563eb' },
 
-  copyBtn:    { width: '100%', padding: '11px 0', background: '#E3F2FD', color: '#1565C0',
-                border: '1.5px solid #90CAF9', borderRadius: 10, fontSize: 14,
-                fontWeight: 600, cursor: 'pointer', marginBottom: 14 },
+  bankCard: { background: 'linear-gradient(135deg,#1d4ed8,#0ea5e9)', borderRadius: 14, padding: '13px 15px', marginBottom: 10, position: 'relative', overflow: 'hidden' },
+  bankBubble: { position: 'absolute', width: 60, height: 60, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', top: -15, right: -10, pointerEvents: 'none' },
+  bankName: { fontSize: 9, color: 'rgba(255,255,255,0.55)', marginBottom: 8 },
+  bankNum: { fontSize: 16, fontWeight: 700, color: '#fff', letterSpacing: 2, marginBottom: 6 },
+  bankOwner: { fontSize: 10, color: 'rgba(255,255,255,0.75)' },
 
-  instruction:{ background: '#FFF8E1', borderRadius: 10, padding: '12px 14px', marginBottom: 14 },
-  instrTitle: { fontSize: 13, fontWeight: 700, color: '#F57F17', marginBottom: 8 },
-  instrStep:  { fontSize: 13, color: '#555', padding: '3px 0', lineHeight: 1.5 },
+  alert: { background: 'linear-gradient(90deg,rgba(254,226,226,0.8),rgba(237,233,254,0.7))', border: '1.5px solid rgba(252,165,165,0.5)', borderRadius: 11, padding: '10px 12px', marginBottom: 12, textAlign: 'center' },
+  alertText: { fontSize: 11, fontWeight: 700, color: '#be185d', lineHeight: 1.5 },
 
-  alertBox:   { background: '#FFEBEE', border: '1.5px solid #EF9A9A', borderRadius: 10,
-                padding: '12px 14px', marginBottom: 12, textAlign: 'center' },
-  alertText:  { fontSize: 14, fontWeight: 700, color: '#C62828', lineHeight: 1.5 },
+  steps: { display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 13 },
+  step: { display: 'flex', alignItems: 'center', gap: 9 },
+  stepNum: { width: 22, height: 22, borderRadius: '50%', background: 'rgba(219,234,254,0.8)', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, flexShrink: 0 },
+  stepText: { fontSize: 11, color: '#475569' },
 
-  btnCard:    { width: '100%', padding: 14, background: '#1976D2', color: '#fff',
-                border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700,
-                cursor: 'pointer', marginBottom: 8 },
-  btnStar:    { width: '100%', padding: 14, background: '#FFB300', color: '#fff',
-                border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700,
-                cursor: 'pointer', marginBottom: 8 },
-  btnRef:     { width: '100%', padding: 14, background: '#2ECC71', color: '#fff',
-                border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700,
-                cursor: 'pointer', marginBottom: 8 },
+  copyBtn: { width: '100%', padding: '10px 0', background: 'rgba(219,234,254,0.8)', color: '#2563eb', border: '1.5px solid rgba(147,197,253,0.5)', borderRadius: 11, fontSize: 12, fontWeight: 700, cursor: 'pointer', marginBottom: 7 },
+  mainBtn: { width: '100%', padding: '12px 0', background: 'linear-gradient(90deg,#3b82f6,#0ea5e9)', color: '#fff', border: 'none', borderRadius: 11, fontSize: 13, fontWeight: 800, cursor: 'pointer', marginBottom: 7 },
 
-  note:       { fontSize: 12, color: '#999', textAlign: 'center' },
+  starsHero: { borderRadius: 14, padding: 16, marginBottom: 14, textAlign: 'center', border: '1.5px solid rgba(253,224,71,0.3)' },
+  starsIcon: { fontSize: 32, marginBottom: 6 },
+  starsTitle: { fontSize: 15, fontWeight: 800, color: '#1e293b', marginBottom: 4 },
+  starsPrice: { fontSize: 20, fontWeight: 900, color: '#b45309', marginBottom: 4 },
+  starsSub: { fontSize: 11, color: '#94a3b8' },
 
-  starsInfo:  { fontSize: 13, color: '#555', background: '#FFF8E1', borderRadius: 8,
-                padding: '10px 12px', marginBottom: 14, lineHeight: 1.6 },
-
-  refInfo:    { display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 },
-  refStep:    { fontSize: 14, color: '#333', padding: '6px 10px',
-                background: '#F0F7FF', borderRadius: 8 },
+  refHero: { textAlign: 'center', marginBottom: 14 },
+  refIcon: { fontSize: 32, marginBottom: 6 },
+  refTitle: { fontSize: 15, fontWeight: 800, color: '#1e293b', marginBottom: 4 },
+  refSub: { fontSize: 11, color: '#94a3b8', lineHeight: 1.5 },
+  refSteps: { display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 },
+  refStep: { display: 'flex', alignItems: 'center', gap: 10, padding: '9px 11px', background: 'rgba(255,255,255,0.6)', borderRadius: 11, border: '1px solid rgba(255,255,255,0.9)' },
+  refStepNum: { width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, flexShrink: 0 },
+  refStepText: { fontSize: 12, color: '#334155', fontWeight: 500 },
 };

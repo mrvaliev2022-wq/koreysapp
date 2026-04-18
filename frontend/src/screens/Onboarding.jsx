@@ -1,56 +1,215 @@
-﻿import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
 import { api } from '../api';
+import { useState } from 'react';
+
+const HANGUL = ['한', '글', '어', '국', '어', '학', '습'];
 
 export default function Onboarding() {
   const { setTrack, setUser, setStats } = useStore();
   const nav = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState(null);
 
   async function choose(track) {
+    setSelected(track);
+    setLoading(true);
     setTrack(track);
-    // Backend yo'q — test user
-    setUser({ id: 1, name: 'Test User', telegram_id: 123, is_premium: false });
-    setStats({ xp: 0, xp_today: 0, streak: 0, lessons_done: 0, freeze_days: 0 });
-    nav('/learn');
+    try {
+      const user = await api.login();
+      setUser(user);
+      const stats = await api.getStats(user.id);
+      setStats(stats);
+    } catch (e) {
+      console.error(e);
+    }
+    nav('/home');
   }
 
   return (
     <div style={s.page}>
-      <div style={s.flag}>🇰🇷</div>
-      <h1 style={s.title}>KoreysApp</h1>
-      <p style={s.sub}>O'zingizga mos yo'nalishni tanlang</p>
+      {/* Background bubbles */}
+      <div style={s.bubble1} />
+      <div style={s.bubble2} />
+      <div style={s.bubble3} />
+      <div style={s.bubble4} />
+      <div style={s.bubble5} />
+
+      {/* Floating hangul chars */}
+      <div style={s.hangulBg}>
+        {HANGUL.map((ch, i) => (
+          <div key={i} style={{
+            ...s.hangulChar,
+            top: (15 + i * 12) + '%',
+            left: (5 + i * 13) + '%',
+            opacity: 0.04 + i * 0.01,
+            fontSize: 40 + i * 8,
+          }}>{ch}</div>
+        ))}
+      </div>
+
+      {/* Logo */}
+      <div style={s.logoWrap}>
+        <div style={s.logoCircle}>
+          <span style={s.logoFlag}>🇰🇷</span>
+        </div>
+        <div style={s.logoTitle}>KoreysApp</div>
+        <div style={s.logoBadge}>TOPIK · EPS-TOPIK</div>
+      </div>
+
+      {/* Subtitle */}
+      <div style={s.sub}>O'zingizga mos yo'nalishni tanlang</div>
+
+      {/* Cards */}
       <div style={s.cards}>
-        <button style={s.card} onClick={() => choose('TOPIK')}>
-          <span style={s.cardIcon}>📚</span>
+
+        {/* TOPIK */}
+        <button style={{
+          ...s.card,
+          ...(selected === 'TOPIK' ? s.cardSelected : {}),
+          ...(loading && selected !== 'TOPIK' ? { opacity: 0.5 } : {}),
+        }} onClick={() => !loading && choose('TOPIK')}>
+          <div style={s.cardBubble} />
+          <div style={s.cardTop}>
+            <div style={s.cardIcoWrap}>
+              <span style={s.cardIco}>📚</span>
+            </div>
+            <div style={s.cardBadge}>Akademik</div>
+          </div>
           <div style={s.cardTitle}>TOPIK</div>
-          <div style={s.cardDesc}>Koreyada o'qish uchun</div>
-          <div style={s.cardTag}>Grammatika · Lug'at · Test</div>
+          <div style={s.cardDesc}>Koreyada o'qish va yashash uchun</div>
+          <div style={s.cardTags}>
+            {['Grammatika', "Lug'at", 'Test', '6 daraja'].map(t => (
+              <span key={t} style={s.cardTag}>{t}</span>
+            ))}
+          </div>
+          <div style={s.cardArrow}>Boshlash →</div>
         </button>
-        <button style={s.card} onClick={() => choose('EPS-TOPIK')}>
-          <span style={s.cardIcon}>💼</span>
+
+        {/* EPS-TOPIK */}
+        <button style={{
+          ...s.card,
+          ...s.cardEps,
+          ...(selected === 'EPS-TOPIK' ? s.cardSelected : {}),
+          ...(loading && selected !== 'EPS-TOPIK' ? { opacity: 0.5 } : {}),
+        }} onClick={() => !loading && choose('EPS-TOPIK')}>
+          <div style={{ ...s.cardBubble, background: 'radial-gradient(circle,rgba(134,239,172,0.15),transparent)' }} />
+          <div style={s.cardTop}>
+            <div style={{ ...s.cardIcoWrap, background: 'rgba(220,252,231,0.8)', border: '1.5px solid rgba(134,239,172,0.5)' }}>
+              <span style={s.cardIco}>💼</span>
+            </div>
+            <div style={{ ...s.cardBadge, background: 'rgba(220,252,231,0.8)', color: '#15803d', borderColor: 'rgba(134,239,172,0.5)' }}>Mehnat</div>
+          </div>
           <div style={s.cardTitle}>EPS-TOPIK</div>
-          <div style={s.cardDesc}>Koreyada ishlash uchun</div>
-          <div style={s.cardTag}>Ish · Xavfsizlik · Huquq</div>
+          <div style={s.cardDesc}>Koreyada ishlash va mehnat visa uchun</div>
+          <div style={s.cardTags}>
+            {['Ish', 'Xavfsizlik', 'Huquq', '60 dars'].map(t => (
+              <span key={t} style={{ ...s.cardTag, background: 'rgba(220,252,231,0.7)', color: '#15803d', borderColor: 'rgba(134,239,172,0.4)' }}>{t}</span>
+            ))}
+          </div>
+          <div style={{ ...s.cardArrow, color: '#15803d' }}>Boshlash →</div>
         </button>
       </div>
-      <div style={s.footer}>done by V.Oybek</div>
+
+      {/* Stats row */}
+      <div style={s.statsRow}>
+        {[
+          { num: '127+', lbl: 'Darslar' },
+          { num: '4500+', lbl: 'Audiolar' },
+          { num: '847', lbl: 'Testlar' },
+        ].map((item, i) => (
+          <div key={i} style={s.statItem}>
+            <div style={s.statNum}>{item.num}</div>
+            <div style={s.statLbl}>{item.lbl}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={s.footer}>made by V.Oybek · KoreysApp 2026</div>
     </div>
   );
 }
 
+const glass = {
+  background: 'rgba(255,255,255,0.62)',
+  backdropFilter: 'blur(12px)',
+  WebkitBackdropFilter: 'blur(12px)',
+  border: '1.5px solid rgba(255,255,255,0.9)',
+};
+
 const s = {
-  page:     { minHeight: '100vh', display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center', padding: 24, background: '#fff' },
-  flag:     { fontSize: 64, marginBottom: 12 },
-  title:    { fontSize: 32, fontWeight: 800, color: '#1a1a1a', marginBottom: 8 },
-  sub:      { fontSize: 16, color: '#666', marginBottom: 40, textAlign: 'center' },
-  cards:    { display: 'flex', flexDirection: 'column', gap: 16, width: '100%', maxWidth: 360 },
-  card:     { background: '#F8F9FF', border: '2px solid #E8EBFF', borderRadius: 16,
-              padding: '24px 20px', cursor: 'pointer', textAlign: 'left', width: '100%' },
-  cardIcon: { fontSize: 36, display: 'block', marginBottom: 8 },
-  cardTitle:{ fontSize: 22, fontWeight: 700, color: '#1a1a1a', marginBottom: 4 },
-  cardDesc: { fontSize: 14, color: '#444', marginBottom: 8 },
-  cardTag:  { fontSize: 12, color: '#888', background: '#EFEFEF', borderRadius: 8,
-              padding: '4px 8px', display: 'inline-block' },
-  footer:   { position: 'fixed', bottom: 16, fontSize: 11, color: '#CCC' },
+  page: {
+    minHeight: '100vh',
+    display: 'flex', flexDirection: 'column',
+    alignItems: 'center', justifyContent: 'center',
+    padding: '24px 20px',
+    background: 'linear-gradient(160deg,#f0f4ff 0%,#e8f4ff 40%,#f0f0ff 100%)',
+    position: 'relative', overflow: 'hidden',
+  },
+
+  // Bubbles
+  bubble1: { position: 'absolute', width: 240, height: 240, borderRadius: '50%', background: 'radial-gradient(circle,rgba(147,197,253,0.28),transparent)', top: -80, right: -60, pointerEvents: 'none' },
+  bubble2: { position: 'absolute', width: 160, height: 160, borderRadius: '50%', background: 'radial-gradient(circle,rgba(134,239,172,0.22),transparent)', bottom: 80, left: -50, pointerEvents: 'none' },
+  bubble3: { position: 'absolute', width: 100, height: 100, borderRadius: '50%', background: 'radial-gradient(circle,rgba(196,181,253,0.2),transparent)', top: 120, left: -20, pointerEvents: 'none' },
+  bubble4: { position: 'absolute', width: 80, height: 80, borderRadius: '50%', background: 'radial-gradient(circle,rgba(253,224,71,0.2),transparent)', bottom: 200, right: -20, pointerEvents: 'none' },
+  bubble5: { position: 'absolute', width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle,rgba(251,207,232,0.2),transparent)', top: 250, right: -30, pointerEvents: 'none' },
+
+  hangulBg: { position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' },
+  hangulChar: { position: 'absolute', color: '#1d4ed8', fontWeight: 900, lineHeight: 1 },
+
+  // Logo
+  logoWrap: { display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 6, position: 'relative', zIndex: 1 },
+  logoCircle: {
+    ...glass,
+    width: 80, height: 80, borderRadius: '50%',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    marginBottom: 12,
+    boxShadow: '0 8px 32px rgba(99,139,255,0.15)',
+  },
+  logoFlag: { fontSize: 40 },
+  logoTitle: { fontSize: 32, fontWeight: 900, color: '#1e293b', letterSpacing: -0.5 },
+  logoBadge: { fontSize: 11, color: '#94a3b8', fontWeight: 600, marginTop: 3, letterSpacing: '.5px' },
+
+  sub: { fontSize: 14, color: '#64748b', marginBottom: 24, textAlign: 'center', position: 'relative', zIndex: 1 },
+
+  // Cards
+  cards: { display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 360, position: 'relative', zIndex: 1, marginBottom: 20 },
+
+  card: {
+    ...glass,
+    borderRadius: 20, padding: '18px 18px 14px',
+    cursor: 'pointer', textAlign: 'left', width: '100%',
+    position: 'relative', overflow: 'hidden',
+    transition: 'transform .15s',
+    border: '1.5px solid rgba(255,255,255,0.9)',
+  },
+  cardEps: {
+    background: 'rgba(240,253,244,0.65)',
+    border: '1.5px solid rgba(134,239,172,0.35)',
+  },
+  cardSelected: {
+    border: '2px solid rgba(59,130,246,0.5)',
+    background: 'rgba(219,234,254,0.7)',
+    transform: 'scale(0.98)',
+  },
+  cardBubble: { position: 'absolute', width: 80, height: 80, borderRadius: '50%', background: 'radial-gradient(circle,rgba(147,197,253,0.15),transparent)', top: -15, right: -15, pointerEvents: 'none' },
+
+  cardTop: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
+  cardIcoWrap: { width: 44, height: 44, borderRadius: 14, background: 'rgba(219,234,254,0.8)', border: '1.5px solid rgba(147,197,253,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  cardIco: { fontSize: 22 },
+  cardBadge: { fontSize: 10, fontWeight: 700, background: 'rgba(219,234,254,0.8)', color: '#2563eb', border: '1px solid rgba(147,197,253,0.4)', borderRadius: 20, padding: '4px 10px' },
+
+  cardTitle: { fontSize: 22, fontWeight: 800, color: '#1e293b', marginBottom: 4 },
+  cardDesc: { fontSize: 12, color: '#64748b', marginBottom: 10 },
+  cardTags: { display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 12 },
+  cardTag: { fontSize: 10, fontWeight: 600, background: 'rgba(219,234,254,0.7)', color: '#2563eb', border: '1px solid rgba(147,197,253,0.4)', borderRadius: 8, padding: '3px 8px' },
+  cardArrow: { fontSize: 12, fontWeight: 800, color: '#2563eb' },
+
+  // Stats
+  statsRow: { display: 'flex', gap: 10, width: '100%', maxWidth: 360, position: 'relative', zIndex: 1, marginBottom: 12 },
+  statItem: { ...glass, flex: 1, borderRadius: 14, padding: '10px 8px', textAlign: 'center' },
+  statNum: { fontSize: 16, fontWeight: 800, color: '#2563eb' },
+  statLbl: { fontSize: 9, color: '#94a3b8', marginTop: 2 },
+
+  footer: { position: 'fixed', bottom: 14, fontSize: 10, color: '#cbd5e1', fontWeight: 500 },
 };

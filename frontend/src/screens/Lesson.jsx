@@ -78,7 +78,7 @@ export default function Lesson() {
       <div style={s.content}>
         {isAlpha
           ? <AlphabetStepContent step={step} lesson={lesson} onTest={() => nav('/test/' + id)} />
-          : <StepContent step={step} lesson={lesson} />}
+          : <StepContent step={step} lesson={lesson} onTest={() => nav('/test/' + id)} />}
       </div>
 
       <div style={s.navRow}>
@@ -334,15 +334,15 @@ function AudioText({ text, audioUrl, small }) {
 
 // ── STYLES ───────────────────────────────────────────
 const s = {
-  page:            { padding: '12px 16px 130px', minHeight: '100vh', userSelect: 'none', background: 'linear-gradient(160deg,#f0f4ff,#e8f4ff 50%,#f0f0ff)', position: 'relative', overflow: 'hidden' },
+  page:            { padding: '12px 16px 130px', minHeight: '100vh', userSelect: 'none', background: 'linear-gradient(160deg,#f8f7ff 0%,#eef2ff 35%,#f0f9ff 65%,#f5f3ff 100%)', position: 'relative', overflow: 'hidden' },
   center:          { display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' },
-  progressBg:      { height: 5, background: 'rgba(219,234,254,0.8)', borderRadius: 3, margin: '0 0 12px' },
+  progressBg:      { height: 5, background: 'rgba(237,233,254,0.7)', borderRadius: 3, margin: '0 0 12px' },
   progressFill:    { height: '100%', borderRadius: 2, transition: 'width .3s' },
   pills:           { display: 'flex', gap: 4, overflowX: 'auto', paddingBottom: 8, marginBottom: 8 },
   pill:            { minWidth: 28, height: 28, borderRadius: '50%', background: 'rgba(255,255,255,0.7)', color: '#94a3b8',
                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11,
                      fontWeight: 700, flexShrink: 0, cursor: 'pointer' },
-  pillActive:      { background: 'linear-gradient(135deg,#3b82f6,#0ea5e9)', color: '#fff', border: 'none' },
+  pillActive:      { background: 'linear-gradient(135deg,#7c3aed,#3b82f6)', color: '#fff', border: 'none' },
   pillActiveAlpha: { background: 'linear-gradient(135deg,#1d4ed8,#0ea5e9)', color: '#fff', border: 'none' },
   pillDone:        { background: 'rgba(74,222,128,0.8)', color: '#fff', border: 'none' },
   stepTitle:       { fontSize: 18, fontWeight: 700, marginBottom: 16 },
@@ -361,7 +361,7 @@ const s = {
                      borderBottom: '1px solid rgba(255,255,255,0.8)', padding: '10px 0' },
   dialogLine:      { background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1.5px solid rgba(255,255,255,0.9)', borderRadius: 12, padding: 12, marginBottom: 8, maxWidth: '80%' },
   dialogRight:     { marginLeft: 'auto', background: 'rgba(219,234,254,0.7)' },
-  speaker:         { fontSize: 11, fontWeight: 700, color: '#2563eb', marginBottom: 4, display: 'block' },
+  speaker:         { fontSize: 11, fontWeight: 700, color: '#7c3aed', marginBottom: 4, display: 'block' },
   note:            { background: 'rgba(254,249,195,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1.5px solid rgba(253,224,71,0.3)', borderRadius: 12, padding: 14, marginBottom: 10,
                      fontSize: 14, color: '#92400e', lineHeight: 1.6 },
   playBtn:         { color: '#3b82f6', opacity: 0.8, display: 'flex', alignItems: 'center' },
@@ -370,7 +370,7 @@ const s = {
   navRow:          { position: 'fixed', bottom: 68, left: 0, right: 0, display: 'flex', gap: 10,
                      padding: '10px 16px', background: 'rgba(240,244,255,0.96)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderTop: '1.5px solid rgba(255,255,255,0.9)', zIndex: 50 },
   prevBtn:         { flex: 1, padding: '13px 0', border: '1.5px solid rgba(147,197,253,0.6)', borderRadius: 14,
-                     background: 'rgba(219,234,254,0.9)', fontSize: 14, cursor: 'pointer', fontWeight: 700, color: '#2563eb' },
+                     background: 'rgba(219,234,254,0.9)', fontSize: 14, cursor: 'pointer', fontWeight: 700, color: '#7c3aed' },
   nextBtn:         { flex: 2, padding: 14, color: '#fff', border: 'none',
                      borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer' },
   alphaHeader:     { display: 'flex', alignItems: 'center', gap: 12,

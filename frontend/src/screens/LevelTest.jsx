@@ -118,8 +118,8 @@ export default function LevelTest() {
         </div>
 
         <div style={s.statsBox}>
-          <div style={{ ...s.stCell, background: 'rgba(219,234,254,0.8)' }}>
-            <div style={{ ...s.stNum, color: '#2563eb' }}>{result.correct}/{result.total}</div>
+          <div style={{ ...s.stCell, background: 'rgba(237,233,254,0.7)' }}>
+            <div style={{ ...s.stNum, color: '#7c3aed' }}>{result.correct}/{result.total}</div>
             <div style={s.stLbl}>Togri</div>
           </div>
           <div style={{ ...s.stCell, background: result.passed ? 'rgba(220,252,231,0.8)' : 'rgba(254,226,226,0.8)' }}>
@@ -218,9 +218,9 @@ const glass = {
 };
 
 const s = {
-  page:      { padding: '16px 16px 100px', minHeight: '100vh', background: 'linear-gradient(160deg,#f0f4ff,#e8f4ff 50%,#f0f0ff)', position: 'relative', overflow: 'hidden' },
-  bubble1:   { position: 'absolute', width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle,rgba(147,197,253,0.25),transparent)', top: -50, right: -50, pointerEvents: 'none' },
-  bubble2:   { position: 'absolute', width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle,rgba(134,239,172,0.2),transparent)', bottom: 200, left: -40, pointerEvents: 'none' },
+  page:      { padding: '16px 16px 100px', minHeight: '100vh', background: 'linear-gradient(160deg,#f8f7ff 0%,#eef2ff 35%,#f0f9ff 65%,#f5f3ff 100%)', position: 'relative', overflow: 'hidden' },
+  bubble1:   { position: 'absolute', width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle,rgba(139,92,246,0.18),transparent)', top: -50, right: -50, pointerEvents: 'none' },
+  bubble2:   { position: 'absolute', width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle,rgba(59,130,246,0.14),transparent)', bottom: 200, left: -40, pointerEvents: 'none' },
   center:    { display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' },
   loader:    { width: 36, height: 36, borderRadius: '50%', border: '3px solid #dbeafe', borderTopColor: '#3b82f6' },
 
@@ -228,14 +228,14 @@ const s = {
   emptyIcon:  { fontSize: 48, fontWeight: 900, color: '#94a3b8', marginBottom: 12 },
   emptyTitle: { fontSize: 18, fontWeight: 700, color: '#1e293b', marginBottom: 6 },
   emptySub:   { fontSize: 13, color: '#64748b', marginBottom: 20 },
-  emptyBtn:   { padding: '12px 24px', background: 'linear-gradient(90deg,#3b82f6,#0ea5e9)', color: '#fff', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer' },
+  emptyBtn:   { padding: '12px 24px', background: 'linear-gradient(90deg,#7c3aed,#3b82f6)', color: '#fff', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer' },
 
   header:    { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, position: 'relative', zIndex: 1 },
   backBtn:   { fontSize: 12, color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px' },
   title:     { fontSize: 18, fontWeight: 800, color: '#1e293b' },
   counter:   { fontSize: 12, color: '#94a3b8', fontWeight: 600 },
-  progBg:    { height: 5, background: 'rgba(219,234,254,0.8)', borderRadius: 3, marginBottom: 18, overflow: 'hidden', position: 'relative', zIndex: 1 },
-  progFill:  { height: '100%', background: 'linear-gradient(90deg,#3b82f6,#0ea5e9)', borderRadius: 3, transition: 'width .3s' },
+  progBg:    { height: 5, background: 'rgba(237,233,254,0.7)', borderRadius: 3, marginBottom: 18, overflow: 'hidden', position: 'relative', zIndex: 1 },
+  progFill:  { height: '100%', background: 'linear-gradient(90deg,#7c3aed,#3b82f6)', borderRadius: 3, transition: 'width .3s' },
 
   qBlock:    { marginBottom: 20, position: 'relative', zIndex: 1 },
   qText:     { fontSize: 14, fontWeight: 700, color: '#1e293b', marginBottom: 10, lineHeight: 1.5 },
@@ -244,7 +244,7 @@ const s = {
   optSel:    { background: 'rgba(219,234,254,0.85)', border: '1.5px solid rgba(59,130,246,0.5)' },
   optLetter: { width: 24, height: 24, borderRadius: '50%', background: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, flexShrink: 0 },
   optLetterSel: { background: '#3b82f6', color: '#fff' },
-  submitBtn: { width: '100%', padding: 15, background: 'linear-gradient(90deg,#3b82f6,#0ea5e9)', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 800, cursor: 'pointer', position: 'relative', zIndex: 1 },
+  submitBtn: { width: '100%', padding: 15, background: 'linear-gradient(90deg,#7c3aed,#3b82f6)', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 800, cursor: 'pointer', position: 'relative', zIndex: 1 },
 
   resultWrap: { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 0', position: 'relative', zIndex: 1 },
   circleOuter:{ width: 120, height: 120, borderRadius: '50%', background: 'rgba(219,234,254,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, border: '2px solid rgba(255,255,255,0.8)' },
@@ -261,8 +261,8 @@ const s = {
   stNum:     { fontSize: 16, fontWeight: 800 },
   stLbl:     { fontSize: 8, color: '#94a3b8', marginTop: 1 },
 
-  btnMain:   { width: '100%', padding: 13, background: 'linear-gradient(90deg,#3b82f6,#0ea5e9)', color: '#fff', border: 'none', borderRadius: 13, fontSize: 13, fontWeight: 800, cursor: 'pointer', marginBottom: 7 },
-  btnSec:    { width: '100%', padding: 11, background: 'rgba(219,234,254,0.8)', color: '#2563eb', border: '1.5px solid rgba(147,197,253,0.5)', borderRadius: 13, fontSize: 12, fontWeight: 700, cursor: 'pointer', marginBottom: 7 },
+  btnMain:   { width: '100%', padding: 13, background: 'linear-gradient(90deg,#7c3aed,#3b82f6)', color: '#fff', border: 'none', borderRadius: 13, fontSize: 13, fontWeight: 800, cursor: 'pointer', marginBottom: 7 },
+  btnSec:    { width: '100%', padding: 11, background: 'rgba(237,233,254,0.7)', color: '#7c3aed', border: '1.5px solid rgba(147,197,253,0.5)', borderRadius: 13, fontSize: 12, fontWeight: 700, cursor: 'pointer', marginBottom: 7 },
   btnStory:  { width: '100%', padding: 11, background: 'linear-gradient(90deg,#7c3aed,#a855f7)', color: '#fff', border: 'none', borderRadius: 13, fontSize: 12, fontWeight: 700, cursor: 'pointer', marginBottom: 7 },
   btnShare:  { width: '100%', padding: 10, background: 'rgba(255,255,255,0.7)', color: '#64748b', border: '1.5px solid rgba(255,255,255,0.9)', borderRadius: 13, fontSize: 11, fontWeight: 600, cursor: 'pointer' },
 };

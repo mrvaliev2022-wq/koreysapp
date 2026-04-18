@@ -6,17 +6,28 @@ export default function ShareCard() {
   const { user, stats } = useStore();
   if (!user) return null;
 
+  const botUrl = 'https://t.me/koreystili_topikkaBot';
   const text =
-    `Bugungi koreys tili natijam!\n` +
-    `KoreysApp — TOPIK · EPS\n\n` +
-    `+${stats?.xp_today ?? 0} XP bugun\n` +
-    `${stats?.streak ?? 0} kunlik streak!\n` +
-    `${stats?.lessons_done ?? 0} ta dars tugatdim\n\n` +
-    `Men ham organmoqchimisiz?\n` +
-    `t.me/koreystili_topikkaBot`;
+    '\uD83C\uDDF0\uD83C\uDDF7 KoreysApp Test Natijam!\n\n' +
+    '\uC548\uB155\uD558\uC138\uC694! \uD55C\uAD6D\uC5B4 \uD559\uC2B5\uC744 \uC2DC\uC791\uD588\uC5B4\uC694! \uD30C\uC774\uD305! \uD83D\uDCAA\n\n' +
+    '\u26A1 +' + (stats?.xp_today ?? 0) + ' XP bugun\n' +
+    '\uD83D\uDD25 ' + (stats?.streak ?? 0) + ' kunlik streak!\n' +
+    '\uD83D\uDCDA ' + (stats?.lessons_done ?? 0) + ' ta dars tugatdim\n\n' +
+    'Siz ham boshlang: ' + botUrl;
 
   function share() {
-    tg?.switchInlineQuery?.(text, ['users', 'chats', 'channels']);
+    if (tg?.openTelegramLink) {
+      tg.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(botUrl) + '&text=' + encodeURIComponent(text));
+    }
+  }
+
+  function shareStory() {
+    if (tg?.shareToStory) {
+      tg.shareToStory('https://koreysapp-qql1.vercel.app/og-image.png', {
+        text: '\uD83C\uDDF0\uD83C\uDDF7 KoreysApp \uD55C\uAD6D\uC5B4 \uD30C\uC774\uD305!',
+        widget_link: { url: botUrl, name: 'KoreysApp' }
+      });
+    } else share();
   }
 
   function copy() {
@@ -24,129 +35,119 @@ export default function ShareCard() {
     tg?.showAlert?.('Nusxa olindi!');
   }
 
-  const statItems = [
-    { icon: '⚡', val: '+' + (stats?.xp_today ?? 0), lbl: 'XP bugun', color: '#fde047' },
-    { icon: '🔥', val: stats?.streak ?? 0,            lbl: 'Streak',   color: '#fb923c' },
-    { icon: '📚', val: stats?.lessons_done ?? 0,      lbl: 'Darslar',  color: '#4ade80' },
+  const STATS = [
+    { ico: '⚡', val: '+' + (stats?.xp_today ?? 0), lbl: 'XP bugun',  col: '#fde047' },
+    { ico: '🔥', val: stats?.streak ?? 0,            lbl: 'Streak',    col: '#fb923c' },
+    { ico: '📚', val: stats?.lessons_done ?? 0,      lbl: 'Darslar',   col: '#34d399' },
   ];
 
   return (
     <div style={s.page}>
-      <div style={s.bubble1} /><div style={s.bubble2} /><div style={s.bubble3} />
+      <div style={s.orb1} /><div style={s.orb2} /><div style={s.orb3} />
 
-      <div style={s.pageTitle}>Natijani ulashing</div>
-      <div style={s.pageSub}>Do'stlaringizni ham o'rganishga taklif qiling!</div>
+      <div style={s.content}>
+        <div style={s.pageTitle}>Natijani ulashing</div>
+        <div style={s.pageSub}>Do'stlaringizni ham o'rganishga taklif qiling! 🚀</div>
 
-      {/* Share card preview */}
-      <div style={s.card}>
-        <div style={s.cardBubble1} /><div style={s.cardBubble2} />
-        <div style={s.cardStripe} />
+        {/* Share card */}
+        <div style={s.card}>
+          <div style={s.cardStripe} />
+          <div style={s.cardOrb1} /><div style={s.cardOrb2} />
+          <div style={s.cardTop}>
+            <div style={s.flag}>🇰🇷</div>
+            <div>
+              <div style={s.cardTitle}>KoreysApp</div>
+              <div style={s.cardSub}>TOPIK · EPS-TOPIK</div>
+            </div>
+          </div>
+          <div style={s.cardKr}>
+            안녕하세요! 한국어 학습을 시작했어요! 파이팅! 💪
+          </div>
+          <div style={s.divider} />
+          <div style={s.statsRow}>
+            {STATS.map((item, i) => (
+              <div key={i} style={s.statItem}>
+                <div style={{ ...s.statIco, background: item.col + '22', border: '1px solid ' + item.col + '44' }}>
+                  <span style={{ fontSize: 16 }}>{item.ico}</span>
+                </div>
+                <div style={s.statVal}>{item.val}</div>
+                <div style={s.statLbl}>{item.lbl}</div>
+              </div>
+            ))}
+          </div>
+          <div style={s.divider} />
+          <div style={s.cardCta}>O'rganmoqchimisiz?</div>
+          <div style={s.cardLink}>t.me/koreystili_topikkaBot</div>
+        </div>
 
-        <div style={s.cardTop}>
-          <div style={s.flag}>🇰🇷</div>
+        {/* User info */}
+        <div style={s.userCard}>
+          <div style={s.userAv}>{(user.name || 'U').charAt(0).toUpperCase()}</div>
           <div>
-            <div style={s.cardTitle}>KoreysApp</div>
-            <div style={s.cardSub}>TOPIK · EPS-TOPIK</div>
+            <div style={s.userName}>{user.name}</div>
+            {user.is_premium && <div style={s.userPrem}>👑 Premium</div>}
           </div>
         </div>
 
-        <div style={s.cardDivider} />
-
-        <div style={s.cardStats}>
-          {statItems.map((item, i) => (
-            <div key={i} style={s.cardStat}>
-              <div style={{ ...s.cardStatIco, background: item.color + '22', border: '1px solid ' + item.color + '44' }}>
-                <span style={{ fontSize: 16 }}>{item.icon}</span>
-              </div>
-              <div style={s.cardStatNum}>{item.val}</div>
-              <div style={s.cardStatLbl}>{item.lbl}</div>
-            </div>
-          ))}
-        </div>
-
-        <div style={s.cardDivider} />
-
-        <div style={s.cardCta}>O'rganmoqchimisiz?</div>
-        <div style={s.cardLink}>t.me/koreystili_topikkaBot</div>
-      </div>
-
-      {/* User info mini */}
-      <div style={s.userCard}>
-        <div style={s.userAv}>
-          {(user.name || 'U').charAt(0).toUpperCase()}
-        </div>
-        <div>
-          <div style={s.userName}>{user.name}</div>
-          {user.is_premium && <div style={s.userPrem}>👑 Premium</div>}
-        </div>
-      </div>
-
-      <div style={s.btnRow}>
-        <button style={s.shareBtn} onClick={share}>
-          📤 Telegram'da ulashish
+        {/* Buttons */}
+        <button style={s.btnStory} onClick={shareStory}>
+          📱 Story ga qo'yish
         </button>
-        <button style={s.copyBtn} onClick={copy}>
-          📋 Nusxa
-        </button>
-      </div>
+        <div style={s.btnRow}>
+          <button style={s.btnShare} onClick={share}>📤 Telegram</button>
+          <button style={s.btnCopy} onClick={copy}>📋 Nusxa</button>
+        </div>
 
-      <div style={s.note}>
-        Do'stingiz siz orqali Premium olsa, sizga ham bepul Premium beriladi!
+        <div style={s.note}>
+          Do'stingiz siz orqali Premium olsa, sizga ham bepul Premium beriladi! 🎁
+        </div>
       </div>
     </div>
   );
 }
 
-const glass = {
-  background: 'rgba(255,255,255,0.62)',
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
-  border: '1.5px solid rgba(255,255,255,0.9)',
-};
+const glass = { background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(124,58,237,0.14)' };
 
 const s = {
-  page: { padding: '16px 16px 100px', minHeight: '100vh', background: 'linear-gradient(160deg,#f0f4ff,#e8f4ff 50%,#f0f0ff)', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center' },
-  bubble1: { position: 'absolute', width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle,rgba(147,197,253,0.25),transparent)', top: -60, right: -60, pointerEvents: 'none' },
-  bubble2: { position: 'absolute', width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle,rgba(134,239,172,0.2),transparent)', bottom: 150, left: -50, pointerEvents: 'none' },
-  bubble3: { position: 'absolute', width: 100, height: 100, borderRadius: '50%', background: 'radial-gradient(circle,rgba(196,181,253,0.2),transparent)', top: 200, left: -30, pointerEvents: 'none' },
+  page: { fontFamily: "'Nunito',sans-serif", minHeight: '100vh', background: 'linear-gradient(160deg,#f8f7ff 0%,#eef2ff 35%,#f0f9ff 65%,#f5f3ff 100%)', position: 'relative', overflow: 'hidden', paddingBottom: 24 },
+  orb1: { position: 'fixed', width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle,rgba(139,92,246,0.18),transparent)', top: -80, right: -60, pointerEvents: 'none', zIndex: 0 },
+  orb2: { position: 'fixed', width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle,rgba(59,130,246,0.14),transparent)', bottom: 100, left: -60, pointerEvents: 'none', zIndex: 0 },
+  orb3: { position: 'fixed', width: 160, height: 160, borderRadius: '50%', background: 'radial-gradient(circle,rgba(167,139,250,0.2),transparent)', top: 200, left: -30, pointerEvents: 'none', zIndex: 0 },
+  content: { position: 'relative', zIndex: 1, padding: '16px 16px 0', display: 'flex', flexDirection: 'column', alignItems: 'center' },
 
-  pageTitle: { fontSize: 20, fontWeight: 800, color: '#1e293b', marginBottom: 4, position: 'relative', zIndex: 1, alignSelf: 'flex-start' },
-  pageSub: { fontSize: 12, color: '#94a3b8', marginBottom: 18, position: 'relative', zIndex: 1, alignSelf: 'flex-start' },
+  pageTitle: { fontSize: 20, fontWeight: 900, color: '#1e1b4b', marginBottom: 4, alignSelf: 'flex-start' },
+  pageSub:   { fontSize: 12, color: '#6b7280', marginBottom: 18, alignSelf: 'flex-start' },
 
-  card: {
-    width: '100%', maxWidth: 340,
-    background: 'linear-gradient(135deg,rgba(29,78,216,0.88),rgba(14,165,233,0.85))',
-    border: '1.5px solid rgba(255,255,255,0.2)',
-    borderRadius: 24, padding: '20px 20px 22px',
-    position: 'relative', overflow: 'hidden', zIndex: 1, marginBottom: 12,
-  },
-  cardBubble1: { position: 'absolute', width: 100, height: 100, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,255,255,0.1),transparent)', top: -25, right: -15, pointerEvents: 'none' },
-  cardBubble2: { position: 'absolute', width: 70, height: 70, borderRadius: '50%', background: 'radial-gradient(circle,rgba(134,239,172,0.15),transparent)', bottom: -15, left: 30, pointerEvents: 'none' },
-  cardStripe: { position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg,#4ade80,#fde047,#a78bfa)', borderRadius: '24px 24px 0 0' },
+  card:      { width: '100%', maxWidth: 360, background: 'linear-gradient(135deg,rgba(109,40,217,0.86),rgba(37,99,235,0.82))', border: '1.5px solid rgba(255,255,255,0.15)', borderRadius: 24, padding: '20px 20px 22px', position: 'relative', overflow: 'hidden', marginBottom: 12, boxShadow: '0 8px 32px rgba(124,58,237,0.22)' },
+  cardStripe:{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg,#a78bfa,#60a5fa,#34d399)', borderRadius: '24px 24px 0 0' },
+  cardOrb1:  { position: 'absolute', width: 110, height: 110, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,255,255,0.1),transparent)', top: -25, right: -15, pointerEvents: 'none' },
+  cardOrb2:  { position: 'absolute', width: 75, height: 75, borderRadius: '50%', background: 'radial-gradient(circle,rgba(167,243,208,0.12),transparent)', bottom: -15, left: 30, pointerEvents: 'none' },
 
-  cardTop: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 },
-  flag: { fontSize: 36 },
-  cardTitle: { fontSize: 22, fontWeight: 900, color: '#fff', lineHeight: 1 },
-  cardSub: { fontSize: 11, color: 'rgba(255,255,255,0.65)', marginTop: 3 },
-  cardDivider: { height: 1, background: 'rgba(255,255,255,0.15)', margin: '12px 0' },
+  cardTop:   { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10, position: 'relative' },
+  flag:      { fontSize: 38 },
+  cardTitle: { fontSize: 24, fontWeight: 900, color: '#fff', lineHeight: 1 },
+  cardSub:   { fontSize: 11, color: 'rgba(255,255,255,0.55)', marginTop: 3 },
+  cardKr:    { fontSize: 12, color: 'rgba(255,255,255,0.8)', marginBottom: 10, lineHeight: 1.5, fontFamily: "'Noto Sans KR',sans-serif", position: 'relative' },
+  divider:   { height: 1, background: 'rgba(255,255,255,0.15)', margin: '10px 0', position: 'relative' },
 
-  cardStats: { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 },
-  cardStat: { textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 },
-  cardStatIco: { width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  cardStatNum: { fontSize: 16, fontWeight: 800, color: '#fff' },
-  cardStatLbl: { fontSize: 9, color: 'rgba(255,255,255,0.6)' },
+  statsRow:  { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, position: 'relative' },
+  statItem:  { textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 },
+  statIco:   { width: 38, height: 38, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  statVal:   { fontSize: 16, fontWeight: 900, color: '#fff' },
+  statLbl:   { fontSize: 9, color: 'rgba(255,255,255,0.6)' },
 
-  cardCta: { fontSize: 12, color: 'rgba(255,255,255,0.75)', textAlign: 'center', marginTop: 4 },
-  cardLink: { fontSize: 13, fontWeight: 700, color: '#fff', textAlign: 'center', marginTop: 3 },
+  cardCta:   { fontSize: 12, color: 'rgba(255,255,255,0.7)', textAlign: 'center', marginTop: 4, position: 'relative' },
+  cardLink:  { fontSize: 13, fontWeight: 800, color: '#fff', textAlign: 'center', marginTop: 3, position: 'relative' },
 
-  userCard: { ...glass, width: '100%', maxWidth: 340, borderRadius: 14, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, position: 'relative', zIndex: 1 },
-  userAv: { width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#3b82f6,#0ea5e9)', color: '#fff', fontSize: 14, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  userName: { fontSize: 13, fontWeight: 700, color: '#1e293b' },
+  userCard: { ...glass, width: '100%', maxWidth: 360, borderRadius: 14, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 },
+  userAv:   { width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg,#7c3aed,#3b82f6)', color: '#fff', fontSize: 15, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  userName: { fontSize: 13, fontWeight: 700, color: '#1e1b4b' },
   userPrem: { fontSize: 10, color: '#b45309', fontWeight: 600, marginTop: 1 },
 
-  btnRow: { display: 'flex', gap: 8, width: '100%', maxWidth: 340, marginBottom: 12, position: 'relative', zIndex: 1 },
-  shareBtn: { flex: 3, padding: '13px 0', background: 'linear-gradient(90deg,#3b82f6,#0ea5e9)', color: '#fff', border: 'none', borderRadius: 13, fontSize: 13, fontWeight: 800, cursor: 'pointer' },
-  copyBtn: { flex: 1, padding: '13px 0', ...glass, color: '#2563eb', borderRadius: 13, fontSize: 13, fontWeight: 700, cursor: 'pointer' },
+  btnStory: { width: '100%', maxWidth: 360, padding: '13px 0', background: 'linear-gradient(90deg,#6d28d9,#7c3aed)', color: '#fff', border: 'none', borderRadius: 14, fontSize: 14, fontWeight: 800, cursor: 'pointer', marginBottom: 8, boxShadow: '0 4px 16px rgba(109,40,217,0.3)' },
+  btnRow:   { display: 'flex', gap: 8, width: '100%', maxWidth: 360, marginBottom: 12 },
+  btnShare: { flex: 3, padding: '12px 0', background: 'linear-gradient(90deg,#7c3aed,#3b82f6)', color: '#fff', border: 'none', borderRadius: 13, fontSize: 13, fontWeight: 800, cursor: 'pointer' },
+  btnCopy:  { flex: 1, padding: '12px 0', ...glass, color: '#7c3aed', borderRadius: 13, fontSize: 13, fontWeight: 700, cursor: 'pointer' },
 
-  note: { ...glass, width: '100%', maxWidth: 340, borderRadius: 12, padding: '10px 14px', fontSize: 11, color: '#64748b', textAlign: 'center', lineHeight: 1.5, position: 'relative', zIndex: 1, background: 'rgba(254,249,195,0.5)', borderColor: 'rgba(253,224,71,0.3)' },
+  note: { ...glass, width: '100%', maxWidth: 360, borderRadius: 13, padding: '10px 14px', fontSize: 11, color: '#4c1d95', textAlign: 'center', lineHeight: 1.5, background: 'rgba(237,233,254,0.6)', borderColor: 'rgba(124,58,237,0.2)' },
 };

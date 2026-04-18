@@ -8,11 +8,13 @@ const API_URL    = process.env.API_URL      || 'https://koreysapp-production.up.
 const ADMIN_IDS  = (process.env.ADMIN_IDS || '').split(',').map(id => parseInt(id.trim())).filter(Boolean);
 const ADMIN_SECRET = process.env.ADMIN_SECRET || 'koreysapp_admin_2026';
 
-const PREMIUM_OK_MSG =
-  "To'lovingiz muvaffaqiyatli tasdiqlandi!\n\n" +
-  "Premiumdan 4 oy foydalanishingiz mumkin!\n" +
-  "Barcha 127+ dars ochildi.\n\n" +
-  "Yaxshi o'qishlar!";
+const PREMIUM_OK_MSG = "To'lovingiz muvaffaqiyatli tasdiqlandi!\n\nPremiumdan 4 oy foydalanishingiz mumkin!\nBarcha 127+ dars ochildi.\n\nYaxshi o'qishlar!";
+const PREMIUM_OK_OPTS = {
+  ...Markup.inlineKeyboard([
+    [Markup.button.webApp('\uD83D\uDE80 Darsni boshlash', 'https://koreysapp-qql1.vercel.app/learn')],
+    [Markup.button.webApp('\uD83C\uDDF0\uD83C\uDDF7 Ilovani ochish', 'https://koreysapp-qql1.vercel.app')],
+  ])
+};
 
 function isAdmin(ctx) {
   return ADMIN_IDS.includes(ctx.from?.id);
@@ -224,7 +226,7 @@ bot.command('give_premium', adminOnly, async (ctx) => {
     const res = await apiPost('/api/premium/admin-activate', { telegramId, method: 'admin_gift', months });
     if (res.ok) {
       await ctx.reply('Premium berildi! ID: ' + telegramId + ', ' + months + ' oy');
-      await bot.telegram.sendMessage(telegramId, PREMIUM_OK_MSG).catch(() => {});
+      await bot.telegram.sendMessage(telegramId, PREMIUM_OK_MSG, PREMIUM_OK_OPTS).catch(() => {});
     } else {
       ctx.reply('Xato: ' + (res.error || 'Nomalum'));
     }
@@ -345,7 +347,7 @@ bot.action(/^approve_(\d+)$/, async (ctx) => {
     const res = await apiPost('/api/premium/admin-activate', { telegramId: targetId, method: 'card', months: 4 });
     if (res.ok) {
       await ctx.editMessageCaption((ctx.callbackQuery.message.caption||'') + '\n\nPREMIUM OCHILDI (4 oy)!');
-      await bot.telegram.sendMessage(targetId, PREMIUM_OK_MSG);
+      await bot.telegram.sendMessage(targetId, PREMIUM_OK_MSG, PREMIUM_OK_OPTS);
     } else { ctx.reply('Xato: ' + (res.error||'Nomalum')); }
   } catch (e) { ctx.reply('Xato: ' + e.message); }
 });
@@ -366,7 +368,7 @@ bot.action(/^give_(\d+)$/, adminOnly, async (ctx) => {
   const res = await apiPost('/api/premium/admin-activate', { telegramId: targetId, method: 'admin_gift', months: 4 }).catch(e => ({ ok: false, error: e.message }));
   if (res.ok) {
     ctx.reply('Premium berildi! ID: ' + targetId);
-    bot.telegram.sendMessage(targetId, PREMIUM_OK_MSG).catch(() => {});
+    bot.telegram.sendMessage(targetId, PREMIUM_OK_MSG, PREMIUM_OK_OPTS).catch(() => {});
   } else { ctx.reply('Xato: ' + res.error); }
 });
 

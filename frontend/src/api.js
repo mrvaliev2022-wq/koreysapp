@@ -1,4 +1,4 @@
-﻿const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const BASE = import.meta.env.VITE_API_URL || 'https://koreysapp-api.railway.app';
 const tg = window.Telegram?.WebApp;
 
 async function request(path, options = {}) {
@@ -11,6 +11,7 @@ async function request(path, options = {}) {
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || `HTTP ${res.status}`);
@@ -19,15 +20,14 @@ async function request(path, options = {}) {
 }
 
 export const api = {
-  login:          ()       => request('/api/auth/login', { method: 'POST' }),
-  getLessons:     (track)  => request(`/api/lessons?track=${track}`),
-  getLesson:      (id)     => request(`/api/lessons/${id}`),
-  completeLesson: (body)   => request('/api/progress/complete', { method: 'POST', body }),
-  getLeaderboard: (type)   => request(`/api/leaderboard?type=${type}`),
-  getStats:       (userId) => request(`/api/stats/${userId}`),
-  activatePremium:(body)   => request('/api/premium/activate', { method: 'POST', body }),
-  confirmStars:   (body)   => request('/api/premium/stars', { method: 'POST', body }),
-  getNextLesson:  (id)     => request('/api/lessons/' + id + '/next'),
-  getCardInfo:    ()       => request('/api/payment/card-info'),
+  login:             ()           => request('/api/auth/login', { method: 'POST' }),
+  getLessons:        (track)      => request(`/api/lessons?track=${track}`),
+  getLesson:         (id)         => request(`/api/lessons/${id}`),
+  completeLesson:    (body)       => request('/api/progress/complete', { method: 'POST', body }),
+  getLeaderboard:    (type)       => request(`/api/leaderboard?type=${type}`),
+  getStats:          (userId)     => request(`/api/stats/${userId}`),
+  getNextLesson:     (id)         => request(`/api/lessons/${id}/next`),
+  getCardInfo:       ()           => request('/api/payment/card-info'),
+  activatePremium:   (body)       => request('/api/premium/activate', { method: 'POST', body }),
+  confirmStars:      (body)       => request('/api/premium/stars', { method: 'POST', body }),
 };
-

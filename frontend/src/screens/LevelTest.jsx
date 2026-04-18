@@ -26,7 +26,13 @@ export default function LevelTest() {
       .finally(() => setLoading(false));
 
     api.getNextLesson(id)
-      .then(d => setNextLesson(d?.next || null))
+      .then(d => {
+        if (d?.requiresPremium) {
+          setNextLesson('premium'); // signal: needs premium
+        } else {
+          setNextLesson(d?.next || null);
+        }
+      })
       .catch(() => setNextLesson(null));
   }, [id]);
 
@@ -128,7 +134,12 @@ export default function LevelTest() {
 
         {result.passed ? (
           <>
-            {nextLesson ? (
+            {nextLesson === 'premium' ? (
+              <button style={{ ...s.btnMain, background: 'linear-gradient(90deg,#f59e0b,#eab308)' }}
+                onClick={() => nav('/premium')}>
+                Keyingi dars Premium! Premium oling &rarr;
+              </button>
+            ) : nextLesson ? (
               <button style={s.btnMain} onClick={() => nav('/lesson/' + nextLesson.id)}>
                 Keyingi darsga otish &rarr;
               </button>

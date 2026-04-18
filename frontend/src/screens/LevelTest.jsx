@@ -66,15 +66,20 @@ export default function LevelTest() {
   }
 
   function shareStory() {
+    const tgApp = window.Telegram?.WebApp;
     const botUrl = 'https://t.me/koreystili_topikkaBot';
-    if (tg?.shareToStory) {
-      tg.shareToStory('https://koreysapp-qql1.vercel.app/og-image.png', {
-        text: 'KoreysApp: ' + (result?.score || 0) + '% - \uD55C\uAD6D\uC5B4 \uD559\uC2B5 \uD30C\uC774\uD305!',
-        widget_link: { url: botUrl, name: 'KoreysApp' }
-      });
-    } else {
-      share();
+    const ver = parseFloat(tgApp?.version || '0');
+    if (ver >= 7.8 && tgApp?.shareToStory) {
+      try {
+        tgApp.shareToStory(
+          'https://koreysapp-qql1.vercel.app/share-og.png',
+          { widget_link: { url: botUrl, name: 'KoreysApp' } }
+        );
+        return;
+      } catch(e) { console.log('story error:', e); }
     }
+    share();
+  }
   }
 
   // Loading

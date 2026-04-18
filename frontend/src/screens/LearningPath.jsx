@@ -77,11 +77,14 @@ export default function LearningPath() {
             <div style={s.list}>
               {sec.lessons.map((l, i) => {
                 const st = STATUS_STYLE[l.status] || STATUS_STYLE.locked;
-                const locked = l.status === 'locked' && !user?.is_premium && !l.is_free;
+                const canAccess = l.is_free || user?.is_premium || l.status === 'completed' || l.status === 'unlocked' || l.status === 'in_progress';
                 return (
                   <button key={l.id}
-                    style={{ ...s.card, background: st.bg, borderColor: st.border, opacity: locked ? 0.55 : 1 }}
-                    onClick={() => !locked && nav('/lesson/' + l.id)}>
+                    style={{ ...s.card, background: st.bg, borderColor: st.border, opacity: canAccess ? 1 : 0.6 }}
+                    onClick={() => {
+                      if (canAccess) nav('/lesson/' + l.id);
+                      else nav('/premium');
+                    }}>
                     <div style={{ ...s.cardNum, color: locked ? '#9ca3af' : '#7c3aed' }}>
                       {sec.offset + i + 1}
                     </div>

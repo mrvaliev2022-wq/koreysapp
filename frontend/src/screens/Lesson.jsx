@@ -119,13 +119,13 @@ function AlphabetStepContent({ step, lesson, onTest }) {
         <div style={a.secTitle}>Asosiy unlilar — 모음</div>
         <div style={a.charGrid}>
           {(ad.vowels_basic || []).map((v, i) => (
-            <CharCard key={i} data={v} audioUrl={lesson.audio_urls?.['vocab_' + i]} />
+            <CharCard key={i} data={v} />
           ))}
         </div>
         <div style={a.secTitle}>Qo'shma unlilar</div>
         <div style={a.charGrid}>
           {(ad.vowels_compound || []).map((v, i) => (
-            <CharCard key={i} data={v} audioUrl={lesson.audio_urls?.['vocab_' + (6 + i)]} small />
+            <CharCard key={i} data={v} small />
           ))}
         </div>
       </div>
@@ -135,7 +135,7 @@ function AlphabetStepContent({ step, lesson, onTest }) {
         <div style={a.secTitle}>Asosiy undoshlar — 자음</div>
         <div style={a.charGrid}>
           {(ad.consonants_basic || []).map((v, i) => (
-            <CharCard key={i} data={v} audioUrl={lesson.audio_urls?.['grammar_' + i]} />
+            <CharCard key={i} data={v} />
           ))}
         </div>
         <div style={a.noteBox}>

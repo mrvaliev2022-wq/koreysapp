@@ -308,7 +308,7 @@ function AudioText({ text, audioUrl, small }) {
     <div style={{ display: 'flex', alignItems: 'center', gap: 8,
                   cursor: audioUrl ? 'pointer' : 'default' }} onClick={play}>
       <span style={{ ...s.krText, fontSize: small ? 15 : undefined }}>{text}</span>
-      {audioUrl && <span style={s.playBtn}>рџ”Љ</span>}
+      {audioUrl && <span style={s.playBtn}>&#128266;</span>}
     </div>
   );
 }
@@ -396,4 +396,5 @@ const a = {
   syllableSound: { fontSize: 14, fontWeight: 700, color: '#1565C0',
                    background: '#E3F2FD', borderRadius: 8, padding: '3px 10px' },
 };
+
 

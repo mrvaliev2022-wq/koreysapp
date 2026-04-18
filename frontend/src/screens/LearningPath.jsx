@@ -85,7 +85,7 @@ export default function LearningPath() {
                       if (canAccess) nav('/lesson/' + l.id);
                       else nav('/premium');
                     }}>
-                    <div style={{ ...s.cardNum, color: locked ? '#9ca3af' : '#7c3aed' }}>
+                    <div style={{ ...s.cardNum, color: !canAccess ? '#9ca3af' : '#7c3aed' }}>
                       {sec.offset + i + 1}
                     </div>
                     <div style={s.cardInfo}>

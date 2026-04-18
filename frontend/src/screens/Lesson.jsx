@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
 import { api } from '../api';
@@ -40,7 +40,7 @@ export default function Lesson() {
 
       {isAlpha && (
         <div style={s.alphaHeader}>
-          <span style={s.alphaHeaderIcon}>н•њкёЂ</span>
+          <span style={s.alphaHeaderIcon}>한글</span>
           <div style={{ flex: 1 }}>
             <div style={s.alphaHeaderTitle}>Harflar</div>
             <div style={s.alphaHeaderSub}>Koreys tilida</div>
@@ -85,7 +85,7 @@ export default function Lesson() {
   );
 }
 
-// в”Ђв”Ђ Alifbo 6 bosqich в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+// ── Alifbo 6 bosqich ──────────────────────────────────
 function AlphabetStepContent({ step, lesson }) {
   const c  = lesson.content || {};
   const ad = c.alphabet_data || {};
@@ -94,14 +94,14 @@ function AlphabetStepContent({ step, lesson }) {
     case 0: return (
       <div>
         <div style={a.heroBanner}>
-          <div style={a.heroChar}>н•њкёЂ</div>
-          <div style={a.heroTitle}>Harflar вЂ” Koreys tilida</div>
-          <div style={a.heroSub}>Hangul В· 1443-yil В· Sejong the Great</div>
+          <div style={a.heroChar}>한글</div>
+          <div style={a.heroTitle}>Harflar — Koreys tilida</div>
+          <div style={a.heroSub}>Hangul · 1443-yil · Sejong the Great</div>
         </div>
         <AudioText text={c.topic?.kr} audioUrl={lesson.audio_urls?.topic} />
         <div style={s.uzText}>{c.topic?.uz}</div>
         {c.notes?.map((note, i) => (
-          <div key={i} style={s.note}>рџ’Ў {note}</div>
+          <div key={i} style={s.note}>💡 {note}</div>
         ))}
         <div style={a.tipBox}>
           Hangul dunyodagi eng ilmiy yozuv tizimlaridan biri. O'qilishi = yozilishi.
@@ -110,7 +110,7 @@ function AlphabetStepContent({ step, lesson }) {
     );
     case 1: return (
       <div>
-        <div style={a.secTitle}>Asosiy unlilar вЂ” лЄЁмќЊ</div>
+        <div style={a.secTitle}>Asosiy unlilar — 모음</div>
         <div style={a.charGrid}>
           {(ad.vowels_basic || []).map((v, i) => (
             <CharCard key={i} data={v} audioUrl={lesson.audio_urls?.['vocab_' + i]} />
@@ -126,26 +126,26 @@ function AlphabetStepContent({ step, lesson }) {
     );
     case 2: return (
       <div>
-        <div style={a.secTitle}>Asosiy undoshlar вЂ” мћђмќЊ</div>
+        <div style={a.secTitle}>Asosiy undoshlar — 자음</div>
         <div style={a.charGrid}>
           {(ad.consonants_basic || []).map((v, i) => (
             <CharCard key={i} data={v} audioUrl={lesson.audio_urls?.['grammar_' + i]} />
           ))}
         </div>
         <div style={a.noteBox}>
-          г…‡ so'z boshida o'qilmaydi: м•„ = "a". So'z oxirida "ng" o'qiladi: л°© = "bang"
+          ㅇ so'z boshida o'qilmaydi: 아 = "a". So'z oxirida "ng" o'qiladi: 방 = "bang"
         </div>
       </div>
     );
     case 3: return (
       <div>
-        <div style={a.secTitle}>Kuchli undoshlar вЂ” мЊЌмћђмќЊ</div>
+        <div style={a.secTitle}>Kuchli undoshlar — 쌍자음</div>
         <div style={a.charGrid}>
           {(ad.consonants_strong || []).map((v, i) => (
             <CharCard key={i} data={v} accent="#B71C1C" />
           ))}
         </div>
-        <div style={a.secTitle}>Aspiratsiyali вЂ” к±°м„јм†Њл¦¬</div>
+        <div style={a.secTitle}>Aspiratsiyali — 거센소리</div>
         <div style={a.charGrid}>
           {(ad.consonants_aspirated || []).map((v, i) => (
             <CharCard key={i} data={v} accent="#1565C0" />
@@ -176,18 +176,19 @@ function AlphabetStepContent({ step, lesson }) {
       </div>
     );
     case 5: return (
-      <div style={s.testHint}>
-        Hangul testiga tayyor!
-        <span style={{ fontSize: 14, color: '#555', fontWeight: 400, marginTop: 8, display: 'block' }}>
-          7 ta savol вЂ” Hangul asoslari
-        </span>
+      <div style={s.testHintWrap}>
+        <div style={s.testHintIcon}>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#15803d" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div style={s.testHint}>Hangul testiga tayyor!</div>
+        <div style={s.testHintSub}>7 ta savol · Hangul asoslari</div>
       </div>
     );
     default: return null;
   }
 }
 
-// в”Ђв”Ђ Harf kartochkasi в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+// ── Harf kartochkasi ──────────────────────────────────
 function CharCard({ data, audioUrl, accent = '#1565C0', small }) {
   function play() { if (audioUrl) new Audio(audioUrl).play().catch(() => {}); }
   return (
@@ -196,12 +197,12 @@ function CharCard({ data, audioUrl, accent = '#1565C0', small }) {
       <div style={a.charSound}>[{data.sound}]</div>
       <div style={a.charExample}>{data.example_kr}</div>
       <div style={a.charMeaning}>{data.example_uz}</div>
-      {audioUrl && <div style={a.charAudio}>рџ”Љ</div>}
+      {audioUrl && <div style={a.charAudio}>🔊</div>}
     </div>
   );
 }
 
-// в”Ђв”Ђ Oddiy dars bosqichlari (6 ta) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+// ── Oddiy dars bosqichlari (6 ta) ─────────────────────
 function StepContent({ step, lesson }) {
   const c = lesson.content || {};
 
@@ -219,7 +220,7 @@ function StepContent({ step, lesson }) {
           <div style={{ marginTop: 16 }}>
             <div style={s.sectionTitle}>Eslatmalar</div>
             {c.notes.map((note, i) => (
-              <div key={i} style={s.note}>рџ’Ў {note}</div>
+              <div key={i} style={s.note}>💡 {note}</div>
             ))}
           </div>
         )}
@@ -289,11 +290,12 @@ function StepContent({ step, lesson }) {
 
     // Step 5: Test
     case 5: return (
-      <div style={s.testHint}>
-        Test tayyor вЂ” "Testga o'tish" tugmasini bosing
-        <span style={{ fontSize: 14, color: '#555', fontWeight: 400, marginTop: 8, display: 'block' }}>
-          7 ta savol В· O'tish uchun 70% kerak
-        </span>
+      <div style={s.testHintWrap}>
+        <div style={s.testHintIcon}>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#15803d" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div style={s.testHint}>Test tayyor!</div>
+        <div style={s.testHintSub}>7 ta savol · O'tish uchun 70% kerak</div>
       </div>
     );
 
@@ -301,21 +303,29 @@ function StepContent({ step, lesson }) {
   }
 }
 
-// в”Ђв”Ђ AudioText в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+// ── AudioText ────────────────────────────────────────
 function AudioText({ text, audioUrl, small }) {
   function play() { if (audioUrl) new Audio(audioUrl).play().catch(() => {}); }
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8,
                   cursor: audioUrl ? 'pointer' : 'default' }} onClick={play}>
       <span style={{ ...s.krText, fontSize: small ? 15 : undefined }}>{text}</span>
-      {audioUrl && <span style={s.playBtn}>&#128266;</span>}
+      {audioUrl && (
+        <span style={s.playBtn}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+        </span>
+      )}
     </div>
   );
 }
 
-// в”Ђв”Ђ STYLES в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+// ── STYLES ───────────────────────────────────────────
 const s = {
-  page:            { padding: '12px 16px 160px', minHeight: '100vh', userSelect: 'none', background: 'linear-gradient(160deg,#f0f4ff,#e8f4ff 50%,#f0f0ff)', position: 'relative', overflow: 'hidden' },
+  page:            { padding: '12px 16px 90px', minHeight: '100vh', userSelect: 'none', background: 'linear-gradient(160deg,#f0f4ff,#e8f4ff 50%,#f0f0ff)', position: 'relative', overflow: 'hidden' },
   center:          { display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' },
   progressBg:      { height: 5, background: 'rgba(219,234,254,0.8)', borderRadius: 3, margin: '0 0 12px' },
   progressFill:    { height: '100%', borderRadius: 2, transition: 'width .3s' },
@@ -345,7 +355,7 @@ const s = {
   speaker:         { fontSize: 11, fontWeight: 700, color: '#2563eb', marginBottom: 4, display: 'block' },
   note:            { background: 'rgba(254,249,195,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1.5px solid rgba(253,224,71,0.3)', borderRadius: 12, padding: 14, marginBottom: 10,
                      fontSize: 14, color: '#92400e', lineHeight: 1.6 },
-  playBtn:         { fontSize: 16, opacity: 0.7 },
+  playBtn:         { color: '#3b82f6', opacity: 0.8, display: 'flex', alignItems: 'center' },
   testHint:        { textAlign: 'center', padding: '60px 20px', fontSize: 18,
                      color: '#15803d', fontWeight: 700, lineHeight: 1.8 },
   navRow:          { position: 'fixed', bottom: '70px', left: 0, right: 0, display: 'flex', gap: 8,
@@ -396,5 +406,3 @@ const a = {
   syllableSound: { fontSize: 14, fontWeight: 700, color: '#1565C0',
                    background: '#E3F2FD', borderRadius: 8, padding: '3px 10px' },
 };
-
-

@@ -33,6 +33,14 @@ export default function LevelTest() {
     }
   }
 
+  function share() {
+    const tg = window.Telegram?.WebApp;
+    const text = 'KoreysApp testida ' + (result?.score || 0) + '% natija oldim! ' + (result?.correct || 0) + '/' + (result?.total || 0) + " to'gri javob.\n\nSiz ham sinab koring: t.me/koreystili_topikkaBot";
+    if (tg?.openTelegramLink) {
+      tg.openTelegramLink('https://t.me/share/url?url=https://t.me/koreystili_topikkaBot&text=' + encodeURIComponent(text));
+    }
+  }
+
   if (!questions.length) return <div style={s.center}><div style={s.loader} /></div>;
 
   if (result) return (
@@ -80,6 +88,10 @@ export default function LevelTest() {
               <button style={s.btnMain} onClick={() => nav('/learn')}>Barcha darslar →</button>
             )}
             <button style={s.btnSec} onClick={() => nav('/learn')}>Darslar royxati</button>
+            <button style={s.btnShare} onClick={share}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:6}}><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Natijani ulashish
+            </button>
           </>
         ) : (
           <>
@@ -175,4 +187,5 @@ const s = {
   stLbl: { fontSize: 8, color: '#94a3b8', marginTop: 1 },
   btnMain: { width: '100%', padding: 13, background: 'linear-gradient(90deg,#3b82f6,#0ea5e9)', color: '#fff', border: 'none', borderRadius: 13, fontSize: 13, fontWeight: 800, cursor: 'pointer', marginBottom: 7 },
   btnSec: { width: '100%', padding: 11, background: 'rgba(219,234,254,0.8)', color: '#2563eb', border: '1.5px solid rgba(147,197,253,0.5)', borderRadius: 13, fontSize: 12, fontWeight: 700, cursor: 'pointer' },
+  btnShare: { width: '100%', padding: 10, background: 'rgba(255,255,255,0.7)', color: '#64748b', border: '1.5px solid rgba(255,255,255,0.9)', borderRadius: 13, fontSize: 11, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' },
 };

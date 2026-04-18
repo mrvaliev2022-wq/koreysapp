@@ -298,10 +298,13 @@ function StepContent({ step, lesson }) {
     case 5: return (
       <div style={s.testHintWrap}>
         <div style={s.testHintIcon}>
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#15803d" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#15803d" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
         <div style={s.testHint}>Test tayyor!</div>
         <div style={s.testHintSub}>7 ta savol · O'tish uchun 70% kerak</div>
+        <div style={s.testStartBtn} onClick={() => window.dispatchEvent(new CustomEvent('fab_next'))}>
+          Testni boshlash →
+        </div>
       </div>
     );
 
@@ -331,7 +334,7 @@ function AudioText({ text, audioUrl, small }) {
 
 // ── STYLES ───────────────────────────────────────────
 const s = {
-  page:            { padding: '12px 16px 0', minHeight: '100vh', userSelect: 'none', background: 'linear-gradient(160deg,#f0f4ff,#e8f4ff 50%,#f0f0ff)', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' },
+  page:            { padding: '12px 16px 130px', minHeight: '100vh', userSelect: 'none', background: 'linear-gradient(160deg,#f0f4ff,#e8f4ff 50%,#f0f0ff)', position: 'relative', overflow: 'hidden' },
   center:          { display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' },
   progressBg:      { height: 5, background: 'rgba(219,234,254,0.8)', borderRadius: 3, margin: '0 0 12px' },
   progressFill:    { height: '100%', borderRadius: 2, transition: 'width .3s' },
@@ -345,7 +348,7 @@ const s = {
   stepTitle:       { fontSize: 18, fontWeight: 700, marginBottom: 16 },
   sectionTitle:    { fontSize: 14, fontWeight: 700, color: '#1976D2',
                      borderLeft: '4px solid #1976D2', paddingLeft: 10, marginBottom: 12, marginTop: 16 },
-  content:         { minHeight: 300, flex: 1, paddingBottom: 16 },
+  content:         { minHeight: 300 },
   krText:          { fontSize: 20, fontWeight: 600, color: '#1a1a1a', lineHeight: 1.6 },
   uzText:          { fontSize: 15, color: '#555', marginTop: 8 },
   uzSmall:         { fontSize: 13, color: '#777', marginTop: 4 },
@@ -364,10 +367,10 @@ const s = {
   playBtn:         { color: '#3b82f6', opacity: 0.8, display: 'flex', alignItems: 'center' },
   testHint:        { textAlign: 'center', padding: '60px 20px', fontSize: 18,
                      color: '#15803d', fontWeight: 700, lineHeight: 1.8 },
-  navRow:          { position: 'sticky', bottom: 0, display: 'flex', gap: 8,
-                     padding: '12px 16px 16px', background: 'rgba(240,244,255,0.92)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderTop: '1.5px solid rgba(255,255,255,0.9)', zIndex: 10, marginTop: 'auto' },
-  prevBtn:         { flex: 1, padding: 14, border: '1.5px solid rgba(147,197,253,0.5)', borderRadius: 12,
-                     background: 'rgba(219,234,254,0.8)', fontSize: 15, cursor: 'pointer', fontWeight: 700, color: '#2563eb' },
+  navRow:          { position: 'fixed', bottom: 68, left: 0, right: 0, display: 'flex', gap: 10,
+                     padding: '10px 16px', background: 'rgba(240,244,255,0.96)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderTop: '1.5px solid rgba(255,255,255,0.9)', zIndex: 50 },
+  prevBtn:         { flex: 1, padding: '13px 0', border: '1.5px solid rgba(147,197,253,0.6)', borderRadius: 14,
+                     background: 'rgba(219,234,254,0.9)', fontSize: 14, cursor: 'pointer', fontWeight: 700, color: '#2563eb' },
   nextBtn:         { flex: 2, padding: 14, color: '#fff', border: 'none',
                      borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer' },
   alphaHeader:     { display: 'flex', alignItems: 'center', gap: 12,

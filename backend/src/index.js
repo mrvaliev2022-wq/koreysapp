@@ -33,11 +33,15 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/lessons', require('./routes/lessons'));
 app.use('/api/progress', require('./routes/progress'));
 app.use('/api/leaderboard', require('./routes/leaderboard'));
+app.use('/api/premium/revoke', require('./routes/admin'));
 app.use('/api/premium', require('./routes/premium'));
 app.use('/api/referral', require('./routes/referral'));
+app.use('/api/stats', require('./routes/admin'));
 app.use('/api/stats', require('./routes/stats'));
 
 app.listen(PORT, () => {
   console.log('Server running on port', PORT);
 });
+
+
 

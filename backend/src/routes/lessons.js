@@ -9,17 +9,34 @@ router.get('/', auth, async (req, res) => {
   const userId = req.user?.id;
 
   try {
-    const lessons = await cached(`lessons:${track}:${userId}`, 60, async () => {
-      const { rows } = await db.query(
-        `SELECT l.id, l.level, l.title_kr, l.title_uz, l.is_free,
-                COALESCE(p.status, 'locked') AS status,
-                p.score
-         FROM lessons l
-         LEFT JOIN user_progress p ON p.lesson_id = l.id AND p.user_id = $1
-         WHERE l.track = $2
-         ORDER BY l.level`,
-        [userId, track]
-      );
+    const cacheKey = userId ? `lessons:${track}:${userId}` : `lessons:${track}:guest`;
+    const lessons = await cached(cacheKey, 60, async () => {
+      let rows;
+      if (userId) {
+        const result = await db.query(
+          `SELECT l.id, l.level, l.title_kr, l.title_uz, l.is_free,
+                  COALESCE(p.status, CASE WHEN l.is_free THEN 'unlocked' ELSE 'locked' END) AS status,
+                  p.score
+           FROM lessons l
+           LEFT JOIN user_progress p ON p.lesson_id = l.id AND p.user_id = $1
+           WHERE l.track = $2
+           ORDER BY l.level`,
+          [userId, track]
+        );
+        rows = result.rows;
+      } else {
+        // Guest: show all lessons, free ones unlocked
+        const result = await db.query(
+          `SELECT id, level, title_kr, title_uz, is_free,
+                  CASE WHEN is_free THEN 'unlocked' ELSE 'locked' END AS status,
+                  NULL as score
+           FROM lessons
+           WHERE track = $1
+           ORDER BY level`,
+          [track]
+        );
+        rows = result.rows;
+      }
       return rows;
     });
     res.json(lessons);

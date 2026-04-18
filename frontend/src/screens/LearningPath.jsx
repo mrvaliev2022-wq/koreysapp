@@ -132,15 +132,20 @@ export default function LearningPath() {
 function buildTopik(lessons) {
   const secs = [];
   for (let lvl = 1; lvl <= 6; lvl++) {
-    const grp = lessons.filter(l => l.level === lvl);
+    const grp = lessons.filter(l => l.level === lvl).sort((a, b) => {
+      // Free lessons first, then by id
+      if (a.is_free && !b.is_free) return -1;
+      if (!a.is_free && b.is_free) return 1;
+      return a.id - b.id;
+    });
     if (grp.length) secs.push({ title: lvl + '-daraja', lessons: grp, offset: (lvl - 1) * 10 });
   }
   return secs;
 }
 
 function buildEps(lessons) {
-  const b1 = lessons.filter(l => l.level >= 1  && l.level <= 30).sort((a, b) => a.level - b.level);
-  const b2 = lessons.filter(l => l.level >= 31 && l.level <= 60).sort((a, b) => a.level - b.level);
+  const b1 = lessons.filter(l => l.level >= 1  && l.level <= 30).sort((a, b) => a.level - b.level || a.id - b.id);
+  const b2 = lessons.filter(l => l.level >= 31 && l.level <= 60).sort((a, b) => a.level - b.level || a.id - b.id);
   const secs = [];
   if (b1.length) secs.push({ title: 'EPS-TOPIK 1 (1-30 dars)', lessons: b1, offset: 0 });
   if (b2.length) secs.push({ title: 'EPS-TOPIK 2 (31-60 dars)', lessons: b2, offset: 30 });

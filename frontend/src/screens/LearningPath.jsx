@@ -11,7 +11,7 @@ const STATUS_STYLE = {
 };
 
 export default function LearningPath() {
-  const { track, lessons, setLessons, user } = useStore();
+  const { track, setTrack, lessons, setLessons, user } = useStore();
   const [loading, setLoading] = useState(!lessons.length);
   const nav = useNavigate();
 
@@ -37,12 +37,23 @@ export default function LearningPath() {
       <div style={s.orb1} /><div style={s.orb2} /><div style={s.orb3} />
 
       <div style={s.content}>
-        {/* Header */}
+        {/* Track switcher */}
+        <div style={s.trackTabs}>
+          <button
+            style={{ ...s.trackTab, ...(track === 'TOPIK' ? s.trackTabActive : {}) }}
+            onClick={() => { setTrack('TOPIK'); setLessons([]); }}>
+            📚 TOPIK
+          </button>
+          <button
+            style={{ ...s.trackTab, ...(track === 'EPS-TOPIK' ? s.trackTabActive : {}) }}
+            onClick={() => { setTrack('EPS-TOPIK'); setLessons([]); }}>
+            💼 EPS-TOPIK
+          </button>
+        </div>
+
+        {/* Progress */}
         <div style={s.header}>
-          <div>
-            <div style={s.trackLabel}>{track === 'TOPIK' ? '📚 TOPIK' : '💼 EPS-TOPIK'}</div>
-            <div style={s.trackSub}>{done}/{main.length} dars yakunlandi</div>
-          </div>
+          <div style={s.trackSub}>{done}/{main.length} dars yakunlandi</div>
           <div style={s.pctCircle}><span style={s.pctTxt}>{pct}%</span></div>
         </div>
 
@@ -148,7 +159,9 @@ const s = {
   loader: { width: 36, height: 36, borderRadius: '50%', border: '3px solid rgba(124,58,237,0.15)', borderTopColor: '#7c3aed' },
 
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  trackLabel: { fontSize: 18, fontWeight: 900, color: '#1e1b4b' },
+  trackTabs:      { display: 'flex', gap: 8, marginBottom: 14 },
+  trackTab:       { flex: 1, padding: '10px 0', borderRadius: 13, background: 'rgba(255,255,255,0.6)', border: '1.5px solid rgba(124,58,237,0.12)', fontSize: 13, fontWeight: 700, cursor: 'pointer', color: '#6b7280' },
+  trackTabActive: { background: 'linear-gradient(135deg,#7c3aed,#3b82f6)', border: 'none', color: '#fff' },
   trackSub:   { fontSize: 11, color: '#6b7280', marginTop: 2 },
   pctCircle:  { ...glass, width: 50, height: 50, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' },
   pctTxt:     { fontSize: 12, fontWeight: 800, color: '#7c3aed' },

@@ -4,7 +4,7 @@ import { useStore } from '../store';
 import { api } from '../api';
 
 export default function Home() {
-  const { user, stats, track, lessons, setLessons } = useStore();
+  const { user, stats, track, setTrack, lessons, setLessons } = useStore();
   const nav = useNavigate();
   const [nextLesson, setNextLesson] = useState(null);
 
@@ -78,6 +78,20 @@ export default function Home() {
               <div style={s.statLbl}>{item.lbl}</div>
             </div>
           ))}
+        </div>
+
+        {/* Track switcher */}
+        <div style={s.trackTabs}>
+          <button
+            style={{ ...s.trackTab, ...(track === 'TOPIK' ? s.trackTabActive : {}) }}
+            onClick={() => { setTrack('TOPIK'); setLessons([]); }}>
+            📚 TOPIK
+          </button>
+          <button
+            style={{ ...s.trackTab, ...(track === 'EPS-TOPIK' ? s.trackTabActive : {}) }}
+            onClick={() => { setTrack('EPS-TOPIK'); setLessons([]); }}>
+            💼 EPS-TOPIK
+          </button>
         </div>
 
         {/* Lesson list */}
@@ -188,6 +202,9 @@ const s = {
   badgeDone:  { fontSize: 10, fontWeight: 700, background: 'rgba(167,243,208,0.6)', color: '#065f46', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 8, padding: '2px 8px' },
   badgeGo:    { fontSize: 14, color: '#7c3aed' },
   badgeFree:  { fontSize: 9, fontWeight: 700, background: 'rgba(16,185,129,0.1)', color: '#059669', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 8, padding: '2px 7px' },
+  trackTabs:      { display: 'flex', gap: 8, marginBottom: 10 },
+  trackTab:       { flex: 1, padding: '9px 0', borderRadius: 12, background: 'rgba(255,255,255,0.6)', border: '1.5px solid rgba(124,58,237,0.12)', fontSize: 12, fontWeight: 700, cursor: 'pointer', color: '#6b7280' },
+  trackTabActive: { background: 'linear-gradient(135deg,#7c3aed,#3b82f6)', border: 'none', color: '#fff' },
 
   premBanner: { width: '100%', background: 'linear-gradient(135deg,rgba(109,40,217,0.08),rgba(37,99,235,0.06))', border: '1.5px solid rgba(124,58,237,0.2)', borderRadius: 16, padding: '13px 14px', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', marginTop: 8, position: 'relative', overflow: 'hidden' },
   premBannerOrb: { position: 'absolute', width: 70, height: 70, borderRadius: '50%', background: 'radial-gradient(circle,rgba(124,58,237,0.12),transparent)', right: -15, top: -15, pointerEvents: 'none' },

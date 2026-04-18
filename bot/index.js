@@ -8,21 +8,17 @@ const API_URL    = process.env.API_URL      || 'https://koreysapp-production.up.
 const ADMIN_IDS  = (process.env.ADMIN_IDS || '').split(',').map(id => parseInt(id.trim())).filter(Boolean);
 const ADMIN_SECRET = process.env.ADMIN_SECRET || 'koreysapp_admin_2026';
 
-// ── Admin tekshirish ──────────────────────────────────────────────────────────
 function isAdmin(ctx) {
   return ADMIN_IDS.includes(ctx.from?.id);
 }
 
 function adminOnly(ctx, next) {
-  if (!isAdmin(ctx)) return; // Ignore non-admin silently
+  if (!isAdmin(ctx)) return;
   return next();
 }
 
-// ── Yordamchi: API so'rov ────────────────────────────────────────────────────
 async function apiGet(path) {
-  const res = await fetch(API_URL + path, {
-    headers: { 'x-admin-key': ADMIN_SECRET }
-  });
+  const res = await fetch(API_URL + path, { headers: { 'x-admin-key': ADMIN_SECRET } });
   return res.json();
 }
 
@@ -35,318 +31,295 @@ async function apiPost(path, body) {
   return res.json();
 }
 
-// ── /start ───────────────────────────────────────────────────────────────────
-bot.start((ctx) => {
-  if (!isAdmin(ctx)) {
+// /start
+bot.start(async (ctx) => {
+  const name = ctx.from.first_name;
+  const startParam = ctx.startPayload;
+
+  // ADMIN
+  if (isAdmin(ctx)) {
     return ctx.reply(
-      'Salom! Bu bot admin uchun.\n\nKoreysApp ilovasiga kirish uchun:\n' + APP_URL
+      'Admin paneliga xush kelibsiz!\n\n' +
+      'Buyruqlar:\n' +
+      '/stats — statistika\n' +
+      '/users — oxirgi userlar\n' +
+      '/premium_list — premium userlar\n' +
+      '/payments — oxirgi tolovlar\n' +
+      '/give_premium [id] [oy] — premium berish\n' +
+      '/revoke [id] — premium olish\n' +
+      '/broadcast [matn] — xabar yuborish\n' +
+      '/health — tizim holati\n' +
+      '/find [id/ism] — user topish',
+      Markup.keyboard([
+        ['\uD83D\uDCCA Statistika', '\uD83D\uDC65 Userlar'],
+        ['\uD83D\uDC8E Premium list', '\uD83D\uDCB3 Tolovlar'],
+        ['\uD83D\uDCE2 Broadcast', '\uD83D\uDD27 Tizim holati'],
+      ]).resize()
     );
   }
 
+  // REFERRAL
+  if (startParam && startParam.startsWith('ref_')) {
+    const referrerId = parseInt(startParam.replace('ref_', ''));
+    if (referrerId && referrerId !== ctx.from.id) {
+      fetch(API_URL + '/api/referral/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newUserId: ctx.from.id, referrerId }),
+      }).catch(() => {});
+    }
+  }
+
+  // ODDIY USER - welcome message
   return ctx.reply(
-    'Admin paneliga xush kelibsiz!\n\n' +
-    'Buyruqlar:\n' +
-    '/stats — statistika\n' +
-    '/users — oxirgi userlar\n' +
-    '/premium_list — premium userlar\n' +
-    '/payments — oxirgi tolovlar\n' +
-    '/give_premium [telegram_id] — premium berish\n' +
-    '/revoke [telegram_id] — premium olish\n' +
-    '/broadcast [matn] — xabar yuborish\n' +
-    '/health — tizim holati\n' +
-    '/help — yordam',
-    Markup.keyboard([
-      ['📊 Statistika', '👥 Userlar'],
-      ['💎 Premium list', '💳 Tolovlar'],
-      ['📢 Broadcast', '🔧 Tizim holati'],
-    ]).resize()
+    'Salom, ' + name + '! \uD83D\uDC4B\u2728\n\n' +
+    '\uD83C\uDDF0\uD83C\uDDF7 <b>KoreysApp</b> ga xush kelibsiz!\n\n' +
+    '\uD83D\uDCDA <b>TOPIK</b> va \uD83D\uDCBC <b>EPS-TOPIK</b> ni\n' +
+    'bitta <b>OSON</b> va <b>QIZIQARLI</b> usulda o\u2019rganing\n' +
+    'va <b>Koreya sari yo\u2019l oling!</b> \u2708\uFE0F\n\n' +
+    '\u2B50 <b>Nima bor?</b>\n' +
+    '\u2705 127+ dars \u2014 TOPIK va EPS-TOPIK\n' +
+    '\uD83D\uDD0A Audio talaffuz \u2014 har bir so\u2018z\n' +
+    '\uD83E\uDDE0 Grammatika tushuntirishlari\n' +
+    '\uD83C\uDFC6 Reyting va streak tizimi\n\n' +
+    '\uD83D\uDE80 Ilovaga kirib darslarni <b>hoziroq boshlang!</b>',
+    {
+      parse_mode: 'HTML',
+      ...Markup.keyboard([
+        [Markup.button.webApp('\uD83D\uDE80 Kirish \uD83C\uDDF0\uD83C\uDDF7', APP_URL)],
+        [Markup.button.webApp('\uD83D\uDCDA Darsni boshlash', APP_URL + '/learn')],
+      ]).resize()
+    }
   );
 });
 
-// ── /help ────────────────────────────────────────────────────────────────────
+// ADMIN COMMANDS
 bot.command('help', adminOnly, (ctx) => {
   ctx.reply(
     'ADMIN BUYRUQLARI:\n\n' +
     '/stats — umumiy statistika\n' +
-    '/users [N] — oxirgi N ta user (default 10)\n' +
+    '/users [N] — oxirgi N ta user\n' +
     '/premium_list — barcha premium userlar\n' +
     '/payments [N] — oxirgi N ta tolov\n' +
-    '/give_premium [id] — Telegram ID ga premium ber\n' +
+    '/give_premium [id] [oy] — premium ber\n' +
     '/revoke [id] — premiumni bekor qil\n' +
     '/broadcast [matn] — hammaga xabar\n' +
-    '/health — backend, DB holati\n' +
-    '/find [id yoki username] — user topish'
+    '/health — backend holati\n' +
+    '/find [id yoki ism] — user topish'
   );
 });
 
-// ── /stats ───────────────────────────────────────────────────────────────────
 bot.command('stats', adminOnly, async (ctx) => {
   try {
     const data = await apiGet('/api/stats/admin');
     ctx.reply(
-      'STATISTIKA\n\n' +
+      '\uD83D\uDCCA STATISTIKA\n\n' +
       'Jami userlar: ' + (data.total_users || 0) + '\n' +
       'Premium userlar: ' + (data.premium_users || 0) + '\n' +
       'Bugun yangi: ' + (data.today_new || 0) + '\n' +
       'Bugun aktiv: ' + (data.today_active || 0) + '\n\n' +
-      'Tolovlar:\n' +
+      '\uD83D\uDCB0 Tolovlar:\n' +
       'Jami: ' + (data.total_payments || 0) + '\n' +
       'Bugun: ' + (data.today_payments || 0) + '\n' +
       'Stars: ' + (data.stars_payments || 0) + '\n' +
       'Karta: ' + (data.card_payments || 0) + '\n\n' +
-      'Darslar:\n' +
-      'Jami o\'tilgan: ' + (data.total_lessons_done || 0) + '\n' +
+      '\uD83D\uDCDA Darslar:\n' +
+      'Jami otilgan: ' + (data.total_lessons_done || 0) + '\n' +
       'Bugun: ' + (data.today_lessons || 0)
     );
-  } catch (e) {
-    ctx.reply('Xato: ' + e.message);
-  }
+  } catch (e) { ctx.reply('Xato: ' + e.message); }
 });
 
-bot.hears('📊 Statistika', adminOnly, async (ctx) => {
-  ctx.telegram.sendMessage(ctx.chat.id, '/stats');
-  bot.handleUpdate({ message: { ...ctx.message, text: '/stats' } });
+bot.hears('\uD83D\uDCCA Statistika', adminOnly, async (ctx) => {
+  try {
+    const data = await apiGet('/api/stats/admin');
+    ctx.reply(
+      '\uD83D\uDCCA STATISTIKA\n\n' +
+      'Jami: ' + (data.total_users || 0) + ' user\n' +
+      'Premium: ' + (data.premium_users || 0) + '\n' +
+      'Bugun yangi: ' + (data.today_new || 0) + '\n' +
+      'Bugun tolov: ' + (data.today_payments || 0)
+    );
+  } catch (e) { ctx.reply('Xato: ' + e.message); }
 });
 
-// ── /users ───────────────────────────────────────────────────────────────────
 bot.command('users', adminOnly, async (ctx) => {
   const limit = parseInt(ctx.message.text.split(' ')[1]) || 10;
   try {
     const data = await apiGet('/api/stats/admin/users?limit=' + limit);
     const users = data.users || [];
     if (!users.length) return ctx.reply('Userlar topilmadi');
-
     let text = 'OXIRGI ' + limit + ' TA USER:\n\n';
     users.forEach((u, i) => {
-      text += (i + 1) + '. ' + (u.name || 'Noma\'lum') + '\n';
-      text += '   ID: ' + u.telegram_id + '\n';
-      text += '   Premium: ' + (u.is_premium ? 'Ha' : 'Yoq') + '\n';
-      text += '   Kirilgan: ' + new Date(u.created_at).toLocaleDateString('uz') + '\n\n';
+      text += (i+1) + '. ' + (u.name||'Nomalum') + ' | ' + (u.is_premium?'PREMIUM':'Free') + '\n   ID: ' + u.telegram_id + '\n';
     });
     ctx.reply(text);
-  } catch (e) {
-    ctx.reply('Xato: ' + e.message);
-  }
+  } catch (e) { ctx.reply('Xato: ' + e.message); }
 });
 
-bot.hears('👥 Userlar', adminOnly, async (ctx) => {
-  const data = await apiGet('/api/stats/admin/users?limit=10').catch(() => ({ users: [] }));
-  const users = data.users || [];
-  let text = 'OXIRGI 10 TA USER:\n\n';
-  users.forEach((u, i) => {
-    text += (i + 1) + '. ' + (u.name || 'Noma\'lum') + ' | ' + (u.is_premium ? 'PREMIUM' : 'Free') + '\n';
-    text += '   TG: ' + u.telegram_id + '\n';
-  });
-  ctx.reply(text || 'Userlar topilmadi');
+bot.hears('\uD83D\uDC65 Userlar', adminOnly, async (ctx) => {
+  try {
+    const data = await apiGet('/api/stats/admin/users?limit=10');
+    const users = data.users || [];
+    let text = 'OXIRGI 10 USER:\n\n';
+    users.forEach((u, i) => {
+      text += (i+1) + '. ' + (u.name||'Nomalum') + ' | ' + (u.is_premium?'PREMIUM':'Free') + '\n   ' + u.telegram_id + '\n';
+    });
+    ctx.reply(text || 'Topilmadi');
+  } catch (e) { ctx.reply('Xato: ' + e.message); }
 });
 
-// ── /premium_list ────────────────────────────────────────────────────────────
 bot.command('premium_list', adminOnly, async (ctx) => {
   try {
     const data = await apiGet('/api/stats/admin/premium');
     const users = data.users || [];
     if (!users.length) return ctx.reply('Premium userlar yoq');
-
-    let text = 'PREMIUM USERLAR (' + users.length + ' ta):\n\n';
+    let text = '\uD83D\uDC8E PREMIUM (' + users.length + ' ta):\n\n';
     users.forEach((u, i) => {
-      const until = u.premium_until ? new Date(u.premium_until).toLocaleDateString('uz') : 'Noma\'lum';
-      text += (i + 1) + '. ' + (u.name || 'Noma\'lum') + '\n';
-      text += '   ID: ' + u.telegram_id + '\n';
-      text += '   Tugaydi: ' + until + '\n\n';
+      const until = u.premium_until ? new Date(u.premium_until).toLocaleDateString('uz') : '-';
+      text += (i+1) + '. ' + (u.name||'Nomalum') + '\n   ID: ' + u.telegram_id + ' | ' + until + '\n';
     });
     ctx.reply(text);
-  } catch (e) {
-    ctx.reply('Xato: ' + e.message);
-  }
+  } catch (e) { ctx.reply('Xato: ' + e.message); }
 });
 
-bot.hears('💎 Premium list', adminOnly, async (ctx) => {
-  ctx.message.text = '/premium_list';
-  const data = await apiGet('/api/stats/admin/premium').catch(() => ({ users: [] }));
-  const users = data.users || [];
-  let text = 'PREMIUM (' + users.length + ' ta):\n\n';
-  users.slice(0, 15).forEach((u, i) => {
-    text += (i + 1) + '. ' + (u.name || 'Noma\'lum') + ' | ' + u.telegram_id + '\n';
-  });
-  ctx.reply(text || 'Premium userlar yoq');
+bot.hears('\uD83D\uDC8E Premium list', adminOnly, async (ctx) => {
+  try {
+    const data = await apiGet('/api/stats/admin/premium');
+    const users = data.users || [];
+    let text = '\uD83D\uDC8E PREMIUM (' + users.length + ' ta):\n\n';
+    users.slice(0,15).forEach((u,i) => {
+      text += (i+1) + '. ' + (u.name||'Nomalum') + ' | ' + u.telegram_id + '\n';
+    });
+    ctx.reply(text || 'Yoq');
+  } catch (e) { ctx.reply('Xato: ' + e.message); }
 });
 
-// ── /payments ────────────────────────────────────────────────────────────────
 bot.command('payments', adminOnly, async (ctx) => {
   const limit = parseInt(ctx.message.text.split(' ')[1]) || 10;
   try {
     const data = await apiGet('/api/stats/admin/payments?limit=' + limit);
     const payments = data.payments || [];
     if (!payments.length) return ctx.reply('Tolovlar topilmadi');
-
-    let text = 'OXIRGI ' + limit + ' TA TOLOV:\n\n';
+    let text = '\uD83D\uDCB3 TOLOVLAR:\n\n';
     payments.forEach((p, i) => {
-      text += (i + 1) + '. ' + (p.name || 'Noma\'lum') + '\n';
-      text += '   Usul: ' + p.method + '\n';
-      text += '   Status: ' + p.status + '\n';
-      text += '   Sana: ' + new Date(p.confirmed_at || p.created_at).toLocaleDateString('uz') + '\n\n';
+      text += (i+1) + '. ' + (p.name||'Nomalum') + ' | ' + p.method + ' | ' + p.status + '\n';
     });
     ctx.reply(text);
-  } catch (e) {
-    ctx.reply('Xato: ' + e.message);
-  }
+  } catch (e) { ctx.reply('Xato: ' + e.message); }
 });
 
-bot.hears('💳 Tolovlar', adminOnly, async (ctx) => {
-  const data = await apiGet('/api/stats/admin/payments?limit=10').catch(() => ({ payments: [] }));
-  const payments = data.payments || [];
-  let text = 'OXIRGI 10 TA TOLOV:\n\n';
-  payments.forEach((p, i) => {
-    text += (i + 1) + '. ' + (p.name || 'Noma\'lum') + ' — ' + p.method + '\n';
-  });
-  ctx.reply(text || 'Tolovlar topilmadi');
+bot.hears('\uD83D\uDCB3 Tolovlar', adminOnly, async (ctx) => {
+  try {
+    const data = await apiGet('/api/stats/admin/payments?limit=10');
+    const payments = data.payments || [];
+    let text = '\uD83D\uDCB3 OXIRGI 10 TOLOV:\n\n';
+    payments.forEach((p,i) => {
+      text += (i+1) + '. ' + (p.name||'Nomalum') + ' \u2014 ' + p.method + '\n';
+    });
+    ctx.reply(text || 'Topilmadi');
+  } catch (e) { ctx.reply('Xato: ' + e.message); }
 });
 
-// ── /give_premium ─────────────────────────────────────────────────────────────
 bot.command('give_premium', adminOnly, async (ctx) => {
   const parts = ctx.message.text.split(' ');
   const telegramId = parseInt(parts[1]);
   const months = parseInt(parts[2]) || 4;
-
-  if (!telegramId) {
-    return ctx.reply('Foydalanish: /give_premium [telegram_id] [oylar]\nMisol: /give_premium 123456789 4');
-  }
-
+  if (!telegramId) return ctx.reply('Foydalanish: /give_premium [telegram_id] [oylar]');
   try {
-    const res = await apiPost('/api/premium/admin-activate', {
-      telegramId, method: 'admin_gift', months
-    });
-
+    const res = await apiPost('/api/premium/admin-activate', { telegramId, method: 'admin_gift', months });
     if (res.ok) {
-      await ctx.reply('Premium berildi!\nID: ' + telegramId + '\nMuddat: ' + months + ' oy');
+      await ctx.reply('\u2705 Premium berildi! ID: ' + telegramId + ', ' + months + ' oy');
       await bot.telegram.sendMessage(telegramId,
-        'Tabriklaymiz! Admin tomonidan ' + months + ' oylik Premium berildi!\n' +
-        'Barcha darslar ochildi. KoreysApp ni oching!'
+        '\uD83C\uDF89 Tabriklaymiz! ' + months + ' oylik Premium berildi!\nBarcha darslar ochildi: ' + APP_URL
       ).catch(() => {});
     } else {
-      ctx.reply('Xato: ' + (res.error || 'Noma\'lum xato'));
+      ctx.reply('Xato: ' + (res.error || 'Nomalum'));
     }
-  } catch (e) {
-    ctx.reply('Xato: ' + e.message);
-  }
+  } catch (e) { ctx.reply('Xato: ' + e.message); }
 });
 
-// ── /revoke ───────────────────────────────────────────────────────────────────
 bot.command('revoke', adminOnly, async (ctx) => {
   const telegramId = parseInt(ctx.message.text.split(' ')[1]);
   if (!telegramId) return ctx.reply('Foydalanish: /revoke [telegram_id]');
-
   try {
     const res = await apiPost('/api/premium/revoke', { telegramId });
-    if (res.ok) {
-      ctx.reply('Premium bekor qilindi. ID: ' + telegramId);
-    } else {
-      ctx.reply('Xato: ' + (res.error || 'Noma\'lum xato'));
-    }
-  } catch (e) {
-    ctx.reply('Xato: ' + e.message);
-  }
+    ctx.reply(res.ok ? 'Premium bekor qilindi. ID: ' + telegramId : 'Xato: ' + res.error);
+  } catch (e) { ctx.reply('Xato: ' + e.message); }
 });
 
-// ── /find ─────────────────────────────────────────────────────────────────────
 bot.command('find', adminOnly, async (ctx) => {
   const query = ctx.message.text.split(' ').slice(1).join(' ');
   if (!query) return ctx.reply('Foydalanish: /find [telegram_id yoki ism]');
-
   try {
     const data = await apiGet('/api/stats/admin/find?q=' + encodeURIComponent(query));
     const user = data.user;
     if (!user) return ctx.reply('User topilmadi: ' + query);
-
     const until = user.premium_until ? new Date(user.premium_until).toLocaleDateString('uz') : '-';
     ctx.reply(
       'USER:\n\n' +
-      'Ism: ' + (user.name || 'Noma\'lum') + '\n' +
-      'Username: ' + (user.username ? '@' + user.username : '-') + '\n' +
+      'Ism: ' + (user.name||'Nomalum') + '\n' +
+      'Username: ' + (user.username ? '@'+user.username : '-') + '\n' +
       'Telegram ID: ' + user.telegram_id + '\n' +
       'Premium: ' + (user.is_premium ? 'Ha (' + until + ' gacha)' : 'Yoq') + '\n' +
-      'Darslar: ' + (user.lessons_done || 0) + '\n' +
-      'XP: ' + (user.xp || 0) + '\n' +
-      'Qo\'shilgan: ' + new Date(user.created_at).toLocaleDateString('uz'),
+      'Darslar: ' + (user.lessons_done||0) + '\n' +
+      'Qoshilgan: ' + new Date(user.created_at).toLocaleDateString('uz'),
       Markup.inlineKeyboard([
         [Markup.button.callback('Premium ber (4 oy)', 'give_' + user.telegram_id)],
         [Markup.button.callback('Premiumni bekor qil', 'revoke_' + user.telegram_id)],
       ])
     );
-  } catch (e) {
-    ctx.reply('Xato: ' + e.message);
-  }
+  } catch (e) { ctx.reply('Xato: ' + e.message); }
 });
 
-// ── /broadcast ────────────────────────────────────────────────────────────────
 bot.command('broadcast', adminOnly, async (ctx) => {
   const text = ctx.message.text.split(' ').slice(1).join(' ');
-  if (!text) return ctx.reply('Foydalanish: /broadcast [matn]\nMisol: /broadcast Yangi darslar qo\'shildi!');
-
-  ctx.reply('Xabar yuborilmoqda...');
-
+  if (!text) return ctx.reply('Foydalanish: /broadcast [matn]');
+  ctx.reply('Yuborilmoqda...');
   try {
     const data = await apiGet('/api/stats/admin/users?limit=10000');
     const users = data.users || [];
     let sent = 0, failed = 0;
-
     for (const user of users) {
       try {
         await bot.telegram.sendMessage(user.telegram_id, text);
         sent++;
-        await new Promise(r => setTimeout(r, 50)); // rate limit
-      } catch (e) {
-        failed++;
-      }
+        await new Promise(r => setTimeout(r, 50));
+      } catch (e) { failed++; }
     }
-
-    ctx.reply('Broadcast tugadi!\nYuborildi: ' + sent + '\nXato: ' + failed);
-  } catch (e) {
-    ctx.reply('Xato: ' + e.message);
-  }
+    ctx.reply('Tugadi! Yuborildi: ' + sent + ', Xato: ' + failed);
+  } catch (e) { ctx.reply('Xato: ' + e.message); }
 });
 
-bot.hears('📢 Broadcast', adminOnly, (ctx) => {
-  ctx.reply('Xabar matnini yozing:\n/broadcast [matn]\n\nMisol:\n/broadcast Yangilik! Yangi darslar qo\'shildi!');
+bot.hears('\uD83D\uDCE2 Broadcast', adminOnly, (ctx) => {
+  ctx.reply('Xabar yozing:\n/broadcast [matn]');
 });
 
-// ── /health ───────────────────────────────────────────────────────────────────
 bot.command('health', adminOnly, async (ctx) => {
   try {
     const start = Date.now();
     const data = await fetch(API_URL + '/health').then(r => r.json());
     const ping = Date.now() - start;
-
     ctx.reply(
-      'TIZIM HOLATI:\n\n' +
-      'Backend: ' + (data.status === 'ok' ? 'Online' : 'Xato') + '\n' +
+      '\uD83D\uDD27 TIZIM HOLATI:\n\n' +
+      'Backend: ' + (data.status === 'ok' ? '\u2705 Online' : '\u274C Xato') + '\n' +
       'Ping: ' + ping + 'ms\n' +
-      'DB: Online\n' +
-      'Bot: Online\n\n' +
-      'Frontend: https://koreysapp-qql1.vercel.app\n' +
-      'Backend: ' + API_URL
+      'Bot: \u2705 Online'
     );
-  } catch (e) {
-    ctx.reply('Backend javob bermayapti!\nXato: ' + e.message);
-  }
+  } catch (e) { ctx.reply('\u274C Backend javob bermayapti!\n' + e.message); }
 });
 
-bot.hears('🔧 Tizim holati', adminOnly, async (ctx) => {
-  ctx.message.text = '/health';
+bot.hears('\uD83D\uDD27 Tizim holati', adminOnly, async (ctx) => {
   try {
     const start = Date.now();
-    const data = await fetch(API_URL + '/health').then(r => r.json());
-    const ping = Date.now() - start;
-    ctx.reply('Backend: ' + (data.status === 'ok' ? 'Online' : 'Xato') + ' | Ping: ' + ping + 'ms');
-  } catch (e) {
-    ctx.reply('Backend javob bermayapti!');
-  }
+    await fetch(API_URL + '/health');
+    ctx.reply('\u2705 Backend Online | ' + (Date.now()-start) + 'ms');
+  } catch (e) { ctx.reply('\u274C Backend javob bermayapti!'); }
 });
 
-// ── Screenshot: Payment qabul qilish ─────────────────────────────────────────
+// Screenshot handler - payment
 bot.on('photo', async (ctx) => {
-  if (isAdmin(ctx)) return; // Admin o'zi rasm yubormaydi
-
+  if (isAdmin(ctx)) return;
   const userId = ctx.from.id;
   const username = ctx.from.username ? '@' + ctx.from.username : ctx.from.first_name;
   const caption = ctx.message.caption || 'yoq';
@@ -355,82 +328,56 @@ bot.on('photo', async (ctx) => {
   for (const adminId of ADMIN_IDS) {
     try {
       await bot.telegram.sendPhoto(adminId, photoId, {
-        caption:
-          'YANGI TOLOV SCREENSHOT!\n\n' +
-          'User: ' + username + '\n' +
-          'Telegram ID: ' + userId + '\n' +
-          'Izoh: ' + caption,
+        caption: 'YANGI TOLOV!\n\nUser: ' + username + '\nID: ' + userId + '\nIzoh: ' + caption,
         ...Markup.inlineKeyboard([
-          [Markup.button.callback('Premium Ochish (4 oy)', 'approve_' + userId)],
-          [Markup.button.callback('Rad etish', 'reject_' + userId)],
+          [Markup.button.callback('\u2705 Premium Ochish (4 oy)', 'approve_' + userId)],
+          [Markup.button.callback('\u274C Rad etish', 'reject_' + userId)],
         ]),
       });
-    } catch (e) {
-      console.error('Admin ga xabar jonatolmadi:', e.message);
-    }
+    } catch (e) { console.error('Admin ga xabar jonatolmadi:', e.message); }
   }
 
   return ctx.reply(
-    'Screenshot qabul qilindi!\n\n' +
+    '\u2705 Screenshot qabul qilindi!\n\n' +
     'Admin 5-30 daqiqa ichida Premium ochadi.\n' +
     'Agar 1 soat ichida ochilmasa, /support yozing.'
   );
 });
 
-// ── Admin inline actions ──────────────────────────────────────────────────────
+// Admin actions
 bot.action(/^approve_(\d+)$/, async (ctx) => {
   if (!isAdmin(ctx)) return ctx.answerCbQuery('Ruxsat yoq!');
   const targetId = parseInt(ctx.match[1]);
   ctx.answerCbQuery('Ochilmoqda...');
-
   try {
-    const res = await apiPost('/api/premium/admin-activate', {
-      telegramId: targetId, method: 'card', months: 4
-    });
-
+    const res = await apiPost('/api/premium/admin-activate', { telegramId: targetId, method: 'card', months: 4 });
     if (res.ok) {
-      await ctx.editMessageCaption(
-        (ctx.callbackQuery.message.caption || '') + '\n\nPREMIUM OCHILDI (4 oy)!'
-      );
+      await ctx.editMessageCaption((ctx.callbackQuery.message.caption||'') + '\n\nPREMIUM OCHILDI (4 oy)!');
       await bot.telegram.sendMessage(targetId,
-        'Tabriklaymiz! Premium faollashtirildi!\n\n' +
-        'Barcha 127+ dars ochildi!\n' +
-        'Muddat: 4 oy\n\n' +
-        'KoreysApp ni oching: ' + APP_URL
+        '\uD83C\uDF89 Premium faollashtirildi!\n\nBarcha 127+ dars ochildi! Muddat: 4 oy\n\n' + APP_URL
       );
-    } else {
-      ctx.reply('Xato: ' + (res.error || 'Noma\'lum'));
-    }
-  } catch (e) {
-    ctx.reply('Server xatosi: ' + e.message);
-  }
+    } else { ctx.reply('Xato: ' + (res.error||'Nomalum')); }
+  } catch (e) { ctx.reply('Xato: ' + e.message); }
 });
 
 bot.action(/^reject_(\d+)$/, async (ctx) => {
   if (!isAdmin(ctx)) return ctx.answerCbQuery('Ruxsat yoq!');
   const targetId = parseInt(ctx.match[1]);
   ctx.answerCbQuery('Rad etildi');
-
-  await ctx.editMessageCaption(
-    (ctx.callbackQuery.message.caption || '') + '\n\nRAD ETILDI'
-  );
+  await ctx.editMessageCaption((ctx.callbackQuery.message.caption||'') + '\n\nRAD ETILDI');
   await bot.telegram.sendMessage(targetId,
-    'Tolov tasdiqlanmadi.\n\n' +
-    'Sabab: Screenshot notogri yoki tolov topilmadi.\n' +
-    'Qaytadan urining yoki /support yozing.'
+    '\u274C Tolov tasdiqlanmadi.\n\nScreenshot notogri yoki tolov topilmadi.\nQaytadan urining.'
   );
 });
 
 bot.action(/^give_(\d+)$/, adminOnly, async (ctx) => {
   const targetId = parseInt(ctx.match[1]);
-  ctx.answerCbQuery('Premium berilmoqda...');
+  ctx.answerCbQuery('Berilmoqda...');
   const res = await apiPost('/api/premium/admin-activate', { telegramId: targetId, method: 'admin_gift', months: 4 }).catch(e => ({ ok: false, error: e.message }));
   if (res.ok) {
-    ctx.reply('Premium berildi! ID: ' + targetId);
-    bot.telegram.sendMessage(targetId, 'Admin tomonidan 4 oylik Premium berildi! Barcha darslar ochildi.').catch(() => {});
-  } else {
-    ctx.reply('Xato: ' + res.error);
-  }
+    ctx.reply('\u2705 Premium berildi! ID: ' + targetId);
+    bot.telegram.sendMessage(targetId, 'Admin tomonidan 4 oylik Premium berildi! ' + APP_URL).catch(() => {});
+  } else { ctx.reply('Xato: ' + res.error); }
 });
 
 bot.action(/^revoke_(\d+)$/, adminOnly, async (ctx) => {
@@ -440,49 +387,40 @@ bot.action(/^revoke_(\d+)$/, adminOnly, async (ctx) => {
   ctx.reply(res.ok ? 'Premium bekor qilindi. ID: ' + targetId : 'Xato: ' + res.error);
 });
 
-// ── Non-admin users: silent (Mini App only) ──────────────────────────────────
-bot.on('message', async (ctx) => {
+// Ignore all other messages from non-admins
+bot.on('message', (ctx) => {
   if (isAdmin(ctx)) return;
-  // Photo = payment screenshot
-  if (ctx.message?.photo) return; // handled separately
-  // Ignore all other messages silently — users should use Mini App
+  // Silent - no response
 });
 
-// ── Kunlik statistika (har kuni 09:00) ───────────────────────────────────────
+// Daily report
 function scheduleDailyReport() {
   const now = new Date();
   const next9 = new Date();
   next9.setHours(9, 0, 0, 0);
   if (next9 <= now) next9.setDate(next9.getDate() + 1);
-  const delay = next9 - now;
-
   setTimeout(async () => {
     try {
       const data = await apiGet('/api/stats/admin');
       const msg =
-        'KUNLIK HISOBOT\n\n' +
-        'Jami userlar: ' + (data.total_users || 0) + '\n' +
-        'Premium: ' + (data.premium_users || 0) + '\n' +
-        'Bugun yangi: ' + (data.today_new || 0) + '\n' +
-        'Bugun aktiv: ' + (data.today_active || 0) + '\n' +
-        'Bugun darslar: ' + (data.today_lessons || 0) + '\n\n' +
-        'Tolovlar bugun: ' + (data.today_payments || 0);
-
+        '\uD83D\uDCCA KUNLIK HISOBOT\n\n' +
+        'Jami userlar: ' + (data.total_users||0) + '\n' +
+        'Premium: ' + (data.premium_users||0) + '\n' +
+        'Bugun yangi: ' + (data.today_new||0) + '\n' +
+        'Bugun aktiv: ' + (data.today_active||0) + '\n' +
+        'Bugun darslar: ' + (data.today_lessons||0) + '\n' +
+        'Bugun tolovlar: ' + (data.today_payments||0);
       for (const adminId of ADMIN_IDS) {
         await bot.telegram.sendMessage(adminId, msg).catch(() => {});
       }
-    } catch (e) {
-      console.error('Daily report error:', e.message);
-    }
-    scheduleDailyReport(); // keyingi kun uchun
-  }, delay);
+    } catch (e) { console.error('Daily report error:', e.message); }
+    scheduleDailyReport();
+  }, next9 - now);
 }
 
-// ── Launch ────────────────────────────────────────────────────────────────────
 bot.launch();
 console.log('Admin bot started');
 scheduleDailyReport();
-console.log('Daily report scheduled');
 
 process.once('SIGINT',  () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));

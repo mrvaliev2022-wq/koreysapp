@@ -77,7 +77,7 @@ export default function Lesson() {
 
       <div style={s.content}>
         {isAlpha
-          ? <AlphabetStepContent step={step} lesson={lesson} />
+          ? <AlphabetStepContent step={step} lesson={lesson} onTest={() => nav('/test/' + id)} />
           : <StepContent step={step} lesson={lesson} />}
       </div>
 
@@ -92,7 +92,7 @@ export default function Lesson() {
 }
 
 // ── Alifbo 6 bosqich ──────────────────────────────────
-function AlphabetStepContent({ step, lesson }) {
+function AlphabetStepContent({ step, lesson, onTest }) {
   const c  = lesson.content || {};
   const ad = c.alphabet_data || {};
 
@@ -209,7 +209,7 @@ function CharCard({ data, audioUrl, accent = '#1565C0', small }) {
 }
 
 // ── Oddiy dars bosqichlari (6 ta) ─────────────────────
-function StepContent({ step, lesson }) {
+function StepContent({ step, lesson, onTest }) {
   const c = lesson.content || {};
 
   switch (step) {
@@ -302,7 +302,7 @@ function StepContent({ step, lesson }) {
         </div>
         <div style={s.testHint}>Test tayyor!</div>
         <div style={s.testHintSub}>7 ta savol · O'tish uchun 70% kerak</div>
-        <div style={s.testStartBtn} onClick={() => window.dispatchEvent(new CustomEvent('fab_next'))}>
+        <div style={s.testStartBtn} onClick={onTest}>
           Testni boshlash →
         </div>
       </div>

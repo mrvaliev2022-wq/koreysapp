@@ -1,9 +1,9 @@
-import { useNavigate } from 'react-router-dom';
+﻿import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
 import { api } from '../api';
 import { useState } from 'react';
 
-const HANGUL = ['한', '글', '어', '국', '어', '학', '습'];
+const HANGUL = ['н•њ', 'кёЂ', 'м–ґ', 'кµ­', 'м–ґ', 'н•™', 'мЉµ'];
 
 export default function Onboarding() {
   const { setTrack, setUser, setStats } = useStore();
@@ -51,10 +51,10 @@ export default function Onboarding() {
       {/* Logo */}
       <div style={s.logoWrap}>
         <div style={s.logoCircle}>
-          <span style={s.logoFlag}>🇰🇷</span>
+          <span style={s.logoFlag}>рџ‡°рџ‡·</span>
         </div>
         <div style={s.logoTitle}>KoreysApp</div>
-        <div style={s.logoBadge}>TOPIK · EPS-TOPIK</div>
+        <div style={s.logoBadge}>TOPIK В· EPS-TOPIK</div>
       </div>
 
       {/* Subtitle */}
@@ -72,7 +72,7 @@ export default function Onboarding() {
           <div style={s.cardBubble} />
           <div style={s.cardTop}>
             <div style={s.cardIcoWrap}>
-              <span style={s.cardIco}>📚</span>
+              <span style={s.cardIco}>рџ“љ</span>
             </div>
             <div style={s.cardBadge}>Akademik</div>
           </div>
@@ -83,7 +83,7 @@ export default function Onboarding() {
               <span key={t} style={s.cardTag}>{t}</span>
             ))}
           </div>
-          <div style={s.cardArrow}>Boshlash →</div>
+          <div style={s.cardArrow}>Boshlash в†’</div>
         </button>
 
         {/* EPS-TOPIK */}
@@ -96,7 +96,7 @@ export default function Onboarding() {
           <div style={{ ...s.cardBubble, background: 'radial-gradient(circle,rgba(134,239,172,0.15),transparent)' }} />
           <div style={s.cardTop}>
             <div style={{ ...s.cardIcoWrap, background: 'rgba(220,252,231,0.8)', border: '1.5px solid rgba(134,239,172,0.5)' }}>
-              <span style={s.cardIco}>💼</span>
+              <span style={s.cardIco}>рџ’ј</span>
             </div>
             <div style={{ ...s.cardBadge, background: 'rgba(220,252,231,0.8)', color: '#15803d', borderColor: 'rgba(134,239,172,0.5)' }}>Mehnat</div>
           </div>
@@ -107,7 +107,7 @@ export default function Onboarding() {
               <span key={t} style={{ ...s.cardTag, background: 'rgba(220,252,231,0.7)', color: '#15803d', borderColor: 'rgba(134,239,172,0.4)' }}>{t}</span>
             ))}
           </div>
-          <div style={{ ...s.cardArrow, color: '#15803d' }}>Boshlash →</div>
+          <div style={{ ...s.cardArrow, color: '#15803d' }}>Boshlash в†’</div>
         </button>
       </div>
 
@@ -125,7 +125,7 @@ export default function Onboarding() {
         ))}
       </div>
 
-      <div style={s.footer}>made by V.Oybek · KoreysApp 2026</div>
+      <div style={s.footer}>made by V.Oybek В· KoreysApp 2026</div>
     </div>
   );
 }
@@ -213,3 +213,4 @@ const s = {
 
   footer: { position: 'fixed', bottom: 14, fontSize: 10, color: '#cbd5e1', fontWeight: 500 },
 };
+

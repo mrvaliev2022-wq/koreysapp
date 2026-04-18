@@ -14,9 +14,7 @@ function isAdmin(ctx) {
 }
 
 function adminOnly(ctx, next) {
-  if (!isAdmin(ctx)) {
-    return ctx.reply('Bu bot faqat admin uchun. Ilovadan foydalaning: ' + APP_URL);
-  }
+  if (!isAdmin(ctx)) return; // Ignore non-admin silently
   return next();
 }
 
@@ -442,22 +440,12 @@ bot.action(/^revoke_(\d+)$/, adminOnly, async (ctx) => {
   ctx.reply(res.ok ? 'Premium bekor qilindi. ID: ' + targetId : 'Xato: ' + res.error);
 });
 
-// ── Non-admin users: minimal response ─────────────────────────────────────────
+// ── Non-admin users: silent (Mini App only) ──────────────────────────────────
 bot.on('message', async (ctx) => {
   if (isAdmin(ctx)) return;
-  const text = ctx.message?.text || '';
-  if (text.startsWith('/')) return;
-
-  // Rasm yuborilmagan bo'lsa
-  if (!ctx.message?.photo) {
-    return ctx.reply(
-      'Tolov screenshotini yuboring!\n\n' +
-      '1. Karta orqali 29 000 som otkazing\n' +
-      '2. Tolov chekining rasmini shu yerga yuboring\n' +
-      '3. Admin 5-30 daqiqada Premium ochadi\n\n' +
-      'Ilova: ' + APP_URL
-    );
-  }
+  // Photo = payment screenshot
+  if (ctx.message?.photo) return; // handled separately
+  // Ignore all other messages silently — users should use Mini App
 });
 
 // ── Kunlik statistika (har kuni 09:00) ───────────────────────────────────────

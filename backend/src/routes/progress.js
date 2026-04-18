@@ -46,11 +46,16 @@ router.post('/complete', auth, async (req, res) => {
       [xpGain, userId]
     );
 
-    // 4. Unlock next lesson — only if free or user is premium
+    // 4. Unlock next lesson — ONLY if next lesson is_free OR user is premium
     const { rows: [nextLesson] } = await client.query(
-      `SELECT l.id, l.is_free FROM lessons l WHERE l.track = (
-         SELECT track FROM lessons WHERE id = $1
-       ) AND l.level = (SELECT level FROM lessons WHERE id = $1) + 1`,
+      `SELECT l.id, l.is_free FROM lessons l
+       WHERE l.track = (SELECT track FROM lessons WHERE id = $1)
+         AND l.id = (
+           SELECT id FROM lessons
+           WHERE track = (SELECT track FROM lessons WHERE id = $1)
+             AND level > (SELECT level FROM lessons WHERE id = $1)
+           ORDER BY level ASC LIMIT 1
+         )`,
       [lessonId]
     );
 
@@ -61,7 +66,8 @@ router.post('/complete', auth, async (req, res) => {
     );
     const isPremium = userRow?.is_premium || false;
 
-    if (nextLesson && (nextLesson.is_free || isPremium)) {
+    // STRICT: only unlock if next lesson is free OR user is premium
+    if (nextLesson && (nextLesson.is_free === true || isPremium === true)) {
       await client.query(
         `INSERT INTO user_progress (user_id, lesson_id, status)
          VALUES ($1, $2, 'unlocked')
@@ -69,6 +75,7 @@ router.post('/complete', auth, async (req, res) => {
         [userId, nextLesson.id]
       );
     }
+    // If not free and not premium — do NOT unlock. User must buy premium.
 
     await client.query('COMMIT');
 

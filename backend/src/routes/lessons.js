@@ -85,22 +85,21 @@ router.get('/:id/next', auth, async (req, res) => {
     );
     if (!current) return res.json({ next: null });
 
-    // Get next lesson
+    // Get next lesson (by level order)
     const { rows: [next] } = await db.query(
-      'SELECT id, title_kr, title_uz, is_free FROM lessons WHERE track = $1 AND level = $2 ORDER BY id LIMIT 1',
-      [current.track, current.level + 1]
+      `SELECT id, title_kr, title_uz, is_free FROM lessons
+       WHERE track = $1 AND level > $2 ORDER BY level ASC LIMIT 1`,
+      [current.track, current.level]
     );
     if (!next) return res.json({ next: null });
 
-    // Check if user can access next lesson
-    const { rows: [user] } = await db.query(
-      'SELECT is_premium FROM users WHERE id = $1',
-      [userId]
-    );
-    const isPremium = user?.is_premium || false;
+    // Check premium
+    const isPremium = userId
+      ? (await db.query('SELECT is_premium FROM users WHERE id = $1', [userId])).rows[0]?.is_premium || false
+      : false;
 
+    // STRICT: if next lesson is NOT free and user is NOT premium → block
     if (!next.is_free && !isPremium) {
-      // User is not premium and next lesson is locked
       return res.json({ next: null, locked: true, requiresPremium: true });
     }
 

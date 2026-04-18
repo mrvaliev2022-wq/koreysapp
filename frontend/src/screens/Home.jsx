@@ -80,24 +80,26 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Recent lessons */}
-        <div style={s.secTitle}>📖 So'nggi darslar</div>
-        {lessons?.slice(0, 4).map((l, i) => {
-          const isDone    = l.status === 'completed';
-          const isActive  = l.status === 'unlocked' || l.status === 'in_progress';
-          const isLocked  = l.status === 'locked' && !l.is_free && !user?.is_premium;
+        {/* Lesson list */}
+        <div style={s.secTitle}>📖 Darslar</div>
+        {lessons?.map((l, i) => {
+          const isDone   = l.status === 'completed';
+          const isActive = l.status === 'unlocked' || l.status === 'in_progress';
+          const canAccess = l.is_free || user?.is_premium || isDone || isActive;
           return (
-            <button key={l.id} style={{ ...s.lessonRow, ...(isActive ? s.lessonActive : {}), opacity: isLocked ? 0.5 : 1 }}
-              onClick={() => !isLocked && nav('/lesson/' + l.id)}>
+            <button key={l.id}
+              style={{ ...s.lessonRow, ...(isActive ? s.lessonActive : {}), opacity: canAccess ? 1 : 0.6 }}
+              onClick={() => canAccess ? nav('/lesson/' + l.id) : nav('/premium')}>
               <div style={{ ...s.lessonIco, ...(isActive ? s.lessonIcoActive : isDone ? s.lessonIcoDone : {}) }}>
-                {isDone ? '✅' : isLocked ? '🔒' : isActive ? '📖' : '📘'}
+                {isDone ? '✅' : !canAccess ? '🔒' : isActive ? '📖' : '📘'}
               </div>
               <div style={s.lessonInfo}>
                 <div style={s.lessonKr}>{l.title_kr}</div>
                 <div style={s.lessonUz}>{l.title_uz} · {i + 1}-dars</div>
               </div>
+              {l.is_free && !isDone && <span style={s.badgeFree}>Bepul</span>}
               {isDone && <span style={s.badgeDone}>{l.score || 0}%</span>}
-              {isActive && <span style={s.badgeGo}>▶</span>}
+              {isActive && !isDone && <span style={s.badgeGo}>▶</span>}
             </button>
           );
         })}
@@ -185,6 +187,7 @@ const s = {
   lessonUz:   { fontSize: 10, color: '#6b7280', marginTop: 2 },
   badgeDone:  { fontSize: 10, fontWeight: 700, background: 'rgba(167,243,208,0.6)', color: '#065f46', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 8, padding: '2px 8px' },
   badgeGo:    { fontSize: 14, color: '#7c3aed' },
+  badgeFree:  { fontSize: 9, fontWeight: 700, background: 'rgba(16,185,129,0.1)', color: '#059669', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 8, padding: '2px 7px' },
 
   premBanner: { width: '100%', background: 'linear-gradient(135deg,rgba(109,40,217,0.08),rgba(37,99,235,0.06))', border: '1.5px solid rgba(124,58,237,0.2)', borderRadius: 16, padding: '13px 14px', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', marginTop: 8, position: 'relative', overflow: 'hidden' },
   premBannerOrb: { position: 'absolute', width: 70, height: 70, borderRadius: '50%', background: 'radial-gradient(circle,rgba(124,58,237,0.12),transparent)', right: -15, top: -15, pointerEvents: 'none' },

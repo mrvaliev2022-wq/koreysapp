@@ -96,7 +96,11 @@ export default function Home() {
 
         {/* Lesson list */}
         <div style={s.secTitle}>📖 Darslar</div>
-        {lessons?.map((l, i) => {
+        {[...(lessons || [])].sort((a, b) => {
+          if (a.is_free && !b.is_free) return -1;
+          if (!a.is_free && b.is_free) return 1;
+          return a.id - b.id;
+        }).map((l, i) => {
           const isDone   = l.status === 'completed';
           const isActive = l.status === 'unlocked' || l.status === 'in_progress';
           const canAccess = l.is_free || user?.is_premium || isDone || isActive;

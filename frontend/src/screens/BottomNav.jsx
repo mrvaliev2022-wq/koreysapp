@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useStore } from '../store';
 
 const NAV = [
   { path: '/home',        icon: '🏠', label: 'Bosh' },
@@ -11,12 +12,26 @@ const NAV = [
 export default function BottomNav() {
   const nav = useNavigate();
   const loc = useLocation();
+  const { lessons, track } = useStore();
+
+  function handleFab() {
+    // Lesson yoki test sahifasida bo'lsa keyingi stepga o'tish uchun event yuboradi
+    const lessonMatch = loc.pathname.match(/\/lesson\/(\d+)/);
+    const testMatch = loc.pathname.match(/\/test\/(\d+)/);
+    if (lessonMatch || testMatch) {
+      // Lesson/Test sahifasida FAB bosilganda custom event
+      window.dispatchEvent(new CustomEvent('fab_next'));
+      return;
+    }
+    // Boshqa sahifalarda /learn ga o'tadi
+    nav('/learn');
+  }
 
   return (
     <nav style={s.nav}>
       {NAV.map((item, i) =>
         item.fab ? (
-          <button key={i} style={s.fab} onClick={() => nav('/learn')}>
+          <button key={i} style={s.fab} onClick={handleFab}>
             <span style={s.fabIcon}>▶</span>
           </button>
         ) : (

@@ -25,9 +25,26 @@ export default function Premium() {
   }
 
   function openBot() {
-    const url = 'https://t.me/koreystili_topikkaBot';
-    if (tg?.openTelegramLink) tg.openTelegramLink(url);
-    else window.open(url, '_blank');
+    // On mobile Telegram, we must close Mini App first then open bot
+    // tg.openLink/openTelegramLink causes only vibration on some versions
+    const botUrl = 'https://t.me/koreystili_topikkaBot';
+    if (tg) {
+      // Show instruction first, then close
+      tg.showPopup({
+        title: 'Screenshotni yuborish',
+        message: 'OK tugmasini bosing — bot chat ochiladi. Keyin to'lov screenshotini yuboring.',
+        buttons: [
+          { id: 'go', type: 'default', text: 'Botga o'tish ✓' },
+          { id: 'cancel', type: 'cancel', text: 'Bekor qilish' }
+        ]
+      }, (btnId) => {
+        if (btnId === 'go') {
+          tg.close();
+        }
+      });
+    } else {
+      window.open(botUrl, '_blank');
+    }
   }
 
   function shareRef() {

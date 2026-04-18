@@ -80,7 +80,6 @@ export default function LevelTest() {
     }
     share();
   }
-  }
 
   // Loading
   if (loading) return (

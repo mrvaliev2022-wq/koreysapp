@@ -47,6 +47,10 @@ export default function Premium() {
         <div style={s.crown}>👑</div>
         <div style={s.heroTitle}>Premium oling!</div>
         <div style={s.heroSub}>127+ dars, audio, grammatika, streak freeze</div>
+        <div style={s.heroPriceBadge}>
+          <span style={s.heroPrice}>29 000 so'm</span>
+          <span style={s.heroDuration}>4 oyga</span>
+        </div>
         <div style={s.feats}>
           {[
             { dot: '#4ade80', text: '127+ dars — TOPIK va EPS-TOPIK' },

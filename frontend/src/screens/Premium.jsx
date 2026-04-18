@@ -31,11 +31,11 @@ export default function Premium() {
     if (tg) {
       // Show instruction first, then close
       tg.showPopup({
-        title: 'Screenshotni yuborish',
-        message: 'OK tugmasini bosing — bot chat ochiladi. Keyin to'lov screenshotini yuboring.',
+         title: "Screenshotni yuborish",
+         message: "OK bosing — bot chat ochiladi, tolov screenshotini yuboring.",
         buttons: [
-          { id: 'go', type: 'default', text: 'Botga o'tish ✓' },
-          { id: 'cancel', type: 'cancel', text: 'Bekor qilish' }
+           { id: "go", type: "default", text: "Botga otish" },
+          { id: "cancel", type: "cancel", text: "Bekor qilish" }
         ]
       }, (btnId) => {
         if (btnId === 'go') {

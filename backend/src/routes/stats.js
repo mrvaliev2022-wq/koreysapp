@@ -1,209 +1,96 @@
-const express = require('express');
-const router = express.Router();
-const { Pool } = require('pg');
+﻿const router = require('express').Router();
+const db = require('../db');
+const auth = require('../middleware/auth');
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
-
-// ─── ADMIN SECRET middleware ───────────────────────────────────────────────
-function adminAuth(req, res, next) {
-  const secret = req.headers['x-admin-secret'] || req.query.secret;
-  if (secret !== process.env.ADMIN_SECRET) {
-    return res.status(403).json({ error: 'Forbidden' });
-  }
-  next();
-}
-
-// ─── GET /api/stats/admin  (Bot /stats command calls this) ────────────────
-router.get('/admin', adminAuth, async (req, res) => {
+router.get('/admin', async (req, res) => {
+  const key = req.headers['x-admin-key'];
+  if (key !== process.env.ADMIN_SECRET) return res.status(403).json({ error: 'Forbidden' });
   try {
-    const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
-
-    const [
-      totalUsers,
-      premiumUsers,
-      todayNew,
-      todayActive,
-      totalLessons,
-      todayLessons,
-      totalPayments,
-      todayPayments,
-      starsPayments,
-      cardPayments
-    ] = await Promise.all([
-      pool.query('SELECT COUNT(*) FROM users'),
-      pool.query("SELECT COUNT(*) FROM users WHERE subscription_type = 'premium'"),
-      pool.query('SELECT COUNT(*) FROM users WHERE DATE(created_at) = $1', [today]),
-      pool.query('SELECT COUNT(*) FROM user_stats WHERE last_study_date = $1', [today]),
-      pool.query('SELECT COALESCE(SUM(lessons_done),0) FROM user_stats'),
-      pool.query(
-        "SELECT COUNT(*) FROM user_stats WHERE last_study_date = $1",
-        [today]
-      ),
-      pool.query('SELECT COUNT(*) FROM payments'),
-      pool.query('SELECT COUNT(*) FROM payments WHERE DATE(created_at) = $1', [today]),
-      pool.query("SELECT COUNT(*) FROM payments WHERE payment_type = 'stars'"),
-      pool.query("SELECT COUNT(*) FROM payments WHERE payment_type = 'card'")
+    const [users, premium, todayNew, payments, todayPay, stars, card, lessons, todayLessons] = await Promise.all([
+      db.query('SELECT COUNT(*) AS cnt FROM users'),
+      db.query('SELECT COUNT(*) AS cnt FROM users WHERE is_premium = true'),
+      db.query("SELECT COUNT(*) AS cnt FROM users WHERE created_at >= NOW() - INTERVAL '1 day'"),
+      db.query('SELECT COUNT(*) AS cnt FROM payments'),
+      db.query("SELECT COUNT(*) AS cnt FROM payments WHERE confirmed_at >= NOW() - INTERVAL '1 day'"),
+      db.query("SELECT COUNT(*) AS cnt FROM payments WHERE method = 'stars'"),
+      db.query("SELECT COUNT(*) AS cnt FROM payments WHERE method = 'card'"),
+      db.query('SELECT COALESCE(SUM(lessons_done),0) AS cnt FROM user_stats'),
+      db.query("SELECT COUNT(*) AS cnt FROM user_progress WHERE status = 'completed'"),
     ]);
-
     res.json({
-      users: {
-        total: parseInt(totalUsers.rows[0].count),
-        premium: parseInt(premiumUsers.rows[0].count),
-        today_new: parseInt(todayNew.rows[0].count),
-        today_active: parseInt(todayActive.rows[0].count)
-      },
-      lessons: {
-        total: parseInt(totalLessons.rows[0].coalesce),
-        today: parseInt(todayLessons.rows[0].count)
-      },
-      payments: {
-        total: parseInt(totalPayments.rows[0].count),
-        today: parseInt(todayPayments.rows[0].count),
-        stars: parseInt(starsPayments.rows[0].count),
-        card: parseInt(cardPayments.rows[0].count)
-      }
+      total_users: parseInt(users.rows[0].cnt),
+      premium_users: parseInt(premium.rows[0].cnt),
+      today_new: parseInt(todayNew.rows[0].cnt),
+      today_active: 0,
+      total_payments: parseInt(payments.rows[0].cnt),
+      today_payments: parseInt(todayPay.rows[0].cnt),
+      stars_payments: parseInt(stars.rows[0].cnt),
+      card_payments: parseInt(card.rows[0].cnt),
+      total_lessons_done: parseInt(lessons.rows[0].cnt),
+      today_lessons: parseInt(todayLessons.rows[0].cnt),
     });
-  } catch (err) {
-    console.error('Stats admin error:', err);
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ─── GET /api/stats/admin/users ───────────────────────────────────────────
-router.get('/admin/users', adminAuth, async (req, res) => {
+router.get('/admin/users', async (req, res) => {
+  const key = req.headers['x-admin-key'];
+  if (key !== process.env.ADMIN_SECRET) return res.status(403).json({ error: 'Forbidden' });
+  const limit = Math.min(parseInt(req.query.limit) || 10, 10000);
   try {
-    const limit = parseInt(req.query.limit) || 20;
-    const offset = parseInt(req.query.offset) || 0;
-
-    const result = await pool.query(
-      `SELECT u.id, u.telegram_id, u.first_name, u.username,
-              u.subscription_type, u.created_at,
-              COALESCE(s.xp, 0) as xp,
-              COALESCE(s.streak, 0) as streak,
-              COALESCE(s.lessons_done, 0) as lessons_done,
-              s.last_study_date
-       FROM users u
-       LEFT JOIN user_stats s ON s.user_id = u.id
-       ORDER BY u.created_at DESC
-       LIMIT $1 OFFSET $2`,
-      [limit, offset]
-    );
-
-    const total = await pool.query('SELECT COUNT(*) FROM users');
-
-    res.json({
-      users: result.rows,
-      total: parseInt(total.rows[0].count),
-      limit,
-      offset
-    });
-  } catch (err) {
-    console.error('Stats admin/users error:', err);
-    res.status(500).json({ error: err.message });
-  }
+    const { rows } = await db.query(
+      `SELECT u.id, u.telegram_id, u.name, u.username, u.is_premium, u.premium_until, u.created_at,
+              COALESCE(s.lessons_done,0) AS lessons_done, COALESCE(s.xp,0) AS xp
+       FROM users u LEFT JOIN user_stats s ON s.user_id=u.id ORDER BY u.created_at DESC LIMIT $1`, [limit]);
+    res.json({ users: rows });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ─── GET /api/stats/admin/premium ────────────────────────────────────────
-router.get('/admin/premium', adminAuth, async (req, res) => {
+router.get('/admin/premium', async (req, res) => {
+  const key = req.headers['x-admin-key'];
+  if (key !== process.env.ADMIN_SECRET) return res.status(403).json({ error: 'Forbidden' });
   try {
-    const result = await pool.query(
-      `SELECT u.id, u.telegram_id, u.first_name, u.username,
-              u.subscription_type, u.subscription_expires_at, u.created_at
-       FROM users u
-       WHERE u.subscription_type = 'premium'
-       ORDER BY u.subscription_expires_at DESC`
-    );
-    res.json({ premium_users: result.rows, total: result.rows.length });
-  } catch (err) {
-    console.error('Stats admin/premium error:', err);
-    res.status(500).json({ error: err.message });
-  }
+    const { rows } = await db.query(
+      'SELECT u.telegram_id, u.name, u.username, u.premium_until, u.created_at FROM users u WHERE u.is_premium=true ORDER BY u.premium_until DESC');
+    res.json({ users: rows });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ─── GET /api/stats/admin/payments ───────────────────────────────────────
-router.get('/admin/payments', adminAuth, async (req, res) => {
+router.get('/admin/payments', async (req, res) => {
+  const key = req.headers['x-admin-key'];
+  if (key !== process.env.ADMIN_SECRET) return res.status(403).json({ error: 'Forbidden' });
+  const limit = parseInt(req.query.limit) || 10;
   try {
-    const limit = parseInt(req.query.limit) || 20;
-    const offset = parseInt(req.query.offset) || 0;
-
-    const result = await pool.query(
-      `SELECT p.*, u.first_name, u.username, u.telegram_id
-       FROM payments p
-       LEFT JOIN users u ON u.id = p.user_id
-       ORDER BY p.created_at DESC
-       LIMIT $1 OFFSET $2`,
-      [limit, offset]
-    );
-
-    const total = await pool.query('SELECT COUNT(*) FROM payments');
-
-    res.json({
-      payments: result.rows,
-      total: parseInt(total.rows[0].count),
-      limit,
-      offset
-    });
-  } catch (err) {
-    console.error('Stats admin/payments error:', err);
-    res.status(500).json({ error: err.message });
-  }
+    const { rows } = await db.query(
+      `SELECT p.*, u.name, u.telegram_id FROM payments p LEFT JOIN users u ON u.id=p.user_id ORDER BY p.confirmed_at DESC NULLS LAST LIMIT $1`, [limit]);
+    res.json({ payments: rows });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ─── GET /api/stats/admin/find?q=username_or_id ──────────────────────────
-router.get('/admin/find', adminAuth, async (req, res) => {
+router.get('/admin/find', async (req, res) => {
+  const key = req.headers['x-admin-key'];
+  if (key !== process.env.ADMIN_SECRET) return res.status(403).json({ error: 'Forbidden' });
+  const q = req.query.q || '';
   try {
-    const q = req.query.q || '';
-    const result = await pool.query(
-      `SELECT u.id, u.telegram_id, u.first_name, u.last_name, u.username,
-              u.subscription_type, u.subscription_expires_at, u.created_at,
-              COALESCE(s.xp, 0) as xp,
-              COALESCE(s.streak, 0) as streak,
-              COALESCE(s.lessons_done, 0) as lessons_done
-       FROM users u
-       LEFT JOIN user_stats s ON s.user_id = u.id
-       WHERE u.username ILIKE $1
-          OR u.first_name ILIKE $1
-          OR u.telegram_id::text = $2
-       LIMIT 10`,
-      [`%${q}%`, q]
-    );
-    res.json({ users: result.rows });
-  } catch (err) {
-    console.error('Stats admin/find error:', err);
-    res.status(500).json({ error: err.message });
-  }
+    const isId = /^\d+$/.test(q);
+    const { rows } = await db.query(
+      isId
+        ? 'SELECT u.*, COALESCE(s.lessons_done,0) AS lessons_done FROM users u LEFT JOIN user_stats s ON s.user_id=u.id WHERE u.telegram_id=$1'
+        : 'SELECT u.*, COALESCE(s.lessons_done,0) AS lessons_done FROM users u LEFT JOIN user_stats s ON s.user_id=u.id WHERE u.name ILIKE $1 OR u.username ILIKE $1',
+      isId ? [parseInt(q)] : [`%${q}%`]);
+    res.json({ user: rows[0] || null });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ─── GET /api/stats/:userId  (individual user stats — keep for app) ───────
-router.get('/:userId', async (req, res) => {
+router.get('/:userId', auth, async (req, res) => {
+  const { userId } = req.params;
+  if (userId === 'admin') return res.status(403).json({ error: 'Forbidden' });
   try {
-    const { userId } = req.params;
-
-    // Prevent "admin" string being treated as userId
-    if (isNaN(userId)) {
-      return res.status(400).json({ error: 'Invalid userId' });
-    }
-
-    const result = await pool.query(
-      `SELECT s.user_id, s.xp, s.streak, s.freeze_days, s.level,
-              s.lessons_done, s.last_study_date
-       FROM user_stats s
-       WHERE s.user_id = $1`,
-      [parseInt(userId)]
-    );
-
-    if (result.rows.length === 0) {
-      return res.json({ xp: 0, streak: 0, freeze_days: 0, level: 1, lessons_done: 0 });
-    }
-
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error('Stats userId error:', err);
-    res.status(500).json({ error: err.message });
-  }
+    const { rows } = await db.query(
+      `SELECT s.xp, s.streak, s.lessons_done, s.freeze_days,
+              COALESCE(l.xp_total, s.xp) AS xp_total, 0 AS xp_today
+       FROM user_stats s LEFT JOIN leaderboard l ON l.user_id=s.user_id WHERE s.user_id=$1`, [userId]);
+    res.json(rows[0] || { xp:0, streak:0, lessons_done:0, freeze_days:0, xp_today:0, xp_total:0 });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 module.exports = router;

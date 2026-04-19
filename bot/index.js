@@ -73,19 +73,18 @@ bot.start(async (ctx) => {
   }
 
   return ctx.reply(
-    'Salom, ' + name + '!\n\n' +
-    'KoreysApp ga xush kelibsiz!\n\n' +
-    'TOPIK va EPS-TOPIK ni oson va qiziqarli usulda organing\n' +
-    'va Koreya sari yol oling!\n\n' +
-    'Nima bor:\n' +
-    '127+ dars - TOPIK va EPS-TOPIK\n' +
-    'Audio talaffuz - har bir soz\n' +
-    'Grammatika tushuntirishlari\n' +
-    'Reyting va streak tizimi\n\n' +
-    'Ilovaga kirib darslarni hoziroq boshlang!',
+    "\uD83D\uDC4B Salom, " + name + "!\n\n" +
+    "\uD83C\uDDF0\uD83C\uDDF7 KoreysApp ga xush kelibsiz!\n\n" +
+    "Koreya tilini organ — oson, qiziqarli va samarali!\n\n" +
+    "\uD83D\uDCDA 127+ dars — TOPIK va EPS-TOPIK\n" +
+    "\uD83D\uDD0A Audio talaffuz — har bir soz\n" +
+    "\uD83D\uDCDD Grammatika tushuntirishlari\n" +
+    "\uD83C\uDFC6 Reyting va streak tizimi\n" +
+    "\uD83C\uDFAF Testlar va XP tizimi\n\n" +
+    "\uD83D\uDC47 Hoziroq boshlang!",
     Markup.keyboard([
-      [Markup.button.webApp('Kirish', APP_URL)],
-      [Markup.button.webApp('Darsni boshlash', APP_URL + '/learn')],
+      [Markup.button.webApp('\uD83C\uDDF0\uD83C\uDDF7 Kirish', APP_URL)],
+      [Markup.button.webApp('\uD83D\uDE80 Darsni boshlash', APP_URL + '/learn')],
     ]).resize()
   );
 });

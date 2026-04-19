@@ -72,7 +72,7 @@ export default function LevelTest() {
     if (ver >= 7.8 && tgApp?.shareToStory) {
       try {
         tgApp.shareToStory(
-          'https://koreysapp-qql1.vercel.app/share-og.png',
+          'https://koreysapp-qql1.vercel.app/og-image.png',
           { widget_link: { url: botUrl, name: 'KoreysApp' } }
         );
         return;

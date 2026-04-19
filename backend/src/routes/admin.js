@@ -13,7 +13,7 @@ function adminAuth(req, res, next) {
 // GET /api/stats/admin — umumiy statistika
 router.get('/admin', adminAuth, async (req, res) => {
   try {
-    const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
+    const today = new Date().toISOString().slice(0, 10);
 
     const [
       total,
@@ -28,13 +28,13 @@ router.get('/admin', adminAuth, async (req, res) => {
       todayLessons
     ] = await Promise.all([
       db.query('SELECT COUNT(*) FROM users'),
-      db.query("SELECT COUNT(*) FROM users WHERE subscription_type = 'premium'"),
+      db.query('SELECT COUNT(*) FROM users WHERE is_premium = true'),
       db.query('SELECT COUNT(*) FROM users WHERE DATE(created_at) = $1', [today]),
       db.query('SELECT COUNT(*) FROM user_stats WHERE last_study_date = $1', [today]),
       db.query("SELECT COUNT(*) FROM payments WHERE status = 'confirmed'"),
-      db.query("SELECT COUNT(*) FROM payments WHERE status = 'confirmed' AND DATE(created_at) = $1", [today]),
-      db.query("SELECT COUNT(*) FROM payments WHERE payment_type = 'stars' AND status = 'confirmed'"),
-      db.query("SELECT COUNT(*) FROM payments WHERE payment_type = 'card' AND status = 'confirmed'"),
+      db.query("SELECT COUNT(*) FROM payments WHERE status = 'confirmed' AND DATE(confirmed_at) = $1", [today]),
+      db.query("SELECT COUNT(*) FROM payments WHERE method = 'stars' AND status = 'confirmed'"),
+      db.query("SELECT COUNT(*) FROM payments WHERE method = 'card' AND status = 'confirmed'"),
       db.query("SELECT COALESCE(SUM(lessons_done), 0) FROM user_stats"),
       db.query("SELECT COUNT(*) FROM user_stats WHERE last_study_date = $1", [today]),
     ]);
@@ -62,9 +62,8 @@ router.get('/admin/users', adminAuth, async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit) || 10, 10000);
   try {
     const { rows } = await db.query(
-      `SELECT u.id, u.telegram_id, u.first_name as name, u.username,
-              u.subscription_type, u.subscription_expires_at as premium_until,
-              u.created_at,
+      `SELECT u.id, u.telegram_id, u.name, u.username,
+              u.is_premium, u.premium_until, u.created_at,
               COALESCE(s.xp, 0) as xp,
               COALESCE(s.lessons_done, 0) as lessons_done,
               COALESCE(s.streak, 0) as streak
@@ -84,11 +83,9 @@ router.get('/admin/users', adminAuth, async (req, res) => {
 router.get('/admin/premium', adminAuth, async (req, res) => {
   try {
     const { rows } = await db.query(
-      `SELECT id, telegram_id, first_name as name, username,
-              subscription_expires_at as premium_until
-       FROM users
-       WHERE subscription_type = 'premium'
-       ORDER BY subscription_expires_at DESC`
+      `SELECT id, telegram_id, name, username, premium_until
+       FROM users WHERE is_premium = true
+       ORDER BY premium_until DESC`
     );
     res.json({ users: rows });
   } catch (err) {
@@ -102,11 +99,10 @@ router.get('/admin/payments', adminAuth, async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
   try {
     const { rows } = await db.query(
-      `SELECT p.*, u.first_name as name, u.telegram_id
+      `SELECT p.*, u.name, u.telegram_id
        FROM payments p
        LEFT JOIN users u ON u.id = p.user_id
-       ORDER BY p.created_at DESC
-       LIMIT $1`,
+       ORDER BY p.created_at DESC LIMIT $1`,
       [limit]
     );
     res.json({ payments: rows });
@@ -136,8 +132,7 @@ router.get('/admin/find', adminAuth, async (req, res) => {
                   COALESCE(s.xp, 0) as xp
            FROM users u
            LEFT JOIN user_stats s ON s.user_id = u.id
-           WHERE u.first_name ILIKE $1 OR u.username ILIKE $1
-           LIMIT 1`,
+           WHERE u.name ILIKE $1 OR u.username ILIKE $1 LIMIT 1`,
       [isId ? parseInt(q) : '%' + q + '%']
     );
     res.json({ user: rows[0] || null });
@@ -152,12 +147,11 @@ router.post('/revoke', adminAuth, async (req, res) => {
   const { telegramId } = req.body;
   try {
     await db.query(
-      "UPDATE users SET subscription_type = 'free', subscription_expires_at = NULL WHERE telegram_id = $1",
+      'UPDATE users SET is_premium = false, premium_until = NULL WHERE telegram_id = $1',
       [telegramId]
     );
     res.json({ ok: true });
   } catch (err) {
-    console.error('Revoke error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });

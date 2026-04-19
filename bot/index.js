@@ -24,13 +24,13 @@ function adminOnly(ctx, next) {
   return next();
 }
 async function apiGet(path) {
-  const res = await fetch(API_URL + path, { headers: { 'x-admin-key': ADMIN_SECRET } });
+  const res = await fetch(API_URL + path, { headers: { 'x-admin-secret': ADMIN_SECRET } });
   return res.json();
 }
 async function apiPost(path, body) {
   const res = await fetch(API_URL + path, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-admin-key': ADMIN_SECRET },
+    headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
     body: JSON.stringify(body),
   });
   return res.json();

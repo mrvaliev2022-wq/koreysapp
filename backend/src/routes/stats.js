@@ -3,7 +3,7 @@ const db = require('../db');
 const auth = require('../middleware/auth');
 
 router.get('/admin', async (req, res) => {
-  const key = req.headers['x-admin-key'];
+  const key = req.headers['x-admin-key'] || req.headers['x-admin-secret'];
   if (key !== process.env.ADMIN_SECRET) return res.status(403).json({ error: 'Forbidden' });
   try {
     const [users, premium, todayNew, payments, todayPay, stars, card, lessons, todayLessons] = await Promise.all([
@@ -33,7 +33,7 @@ router.get('/admin', async (req, res) => {
 });
 
 router.get('/admin/users', async (req, res) => {
-  const key = req.headers['x-admin-key'];
+  const key = req.headers['x-admin-key'] || req.headers['x-admin-secret'];
   if (key !== process.env.ADMIN_SECRET) return res.status(403).json({ error: 'Forbidden' });
   const limit = Math.min(parseInt(req.query.limit) || 10, 10000);
   try {
@@ -46,7 +46,7 @@ router.get('/admin/users', async (req, res) => {
 });
 
 router.get('/admin/premium', async (req, res) => {
-  const key = req.headers['x-admin-key'];
+  const key = req.headers['x-admin-key'] || req.headers['x-admin-secret'];
   if (key !== process.env.ADMIN_SECRET) return res.status(403).json({ error: 'Forbidden' });
   try {
     const { rows } = await db.query(
@@ -56,7 +56,7 @@ router.get('/admin/premium', async (req, res) => {
 });
 
 router.get('/admin/payments', async (req, res) => {
-  const key = req.headers['x-admin-key'];
+  const key = req.headers['x-admin-key'] || req.headers['x-admin-secret'];
   if (key !== process.env.ADMIN_SECRET) return res.status(403).json({ error: 'Forbidden' });
   const limit = parseInt(req.query.limit) || 10;
   try {
@@ -67,7 +67,7 @@ router.get('/admin/payments', async (req, res) => {
 });
 
 router.get('/admin/find', async (req, res) => {
-  const key = req.headers['x-admin-key'];
+  const key = req.headers['x-admin-key'] || req.headers['x-admin-secret'];
   if (key !== process.env.ADMIN_SECRET) return res.status(403).json({ error: 'Forbidden' });
   const q = req.query.q || '';
   try {

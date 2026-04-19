@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+﻿import { lazy, Suspense, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useStore } from './store';
 import { api } from './api';
@@ -10,7 +10,6 @@ const LearningPath = lazy(() => import('./screens/LearningPath'));
 const Lesson       = lazy(() => import('./screens/Lesson'));
 const LevelTest    = lazy(() => import('./screens/LevelTest'));
 const Leaderboard  = lazy(() => import('./screens/Leaderboard'));
-const ShareCard    = lazy(() => import('./screens/ShareCard'));
 const Profile      = lazy(() => import('./screens/Profile'));
 const Premium      = lazy(() => import('./screens/Premium'));
 
@@ -30,29 +29,33 @@ async function refreshUser(setUser, setStats) {
 }
 
 export default function App() {
-  const { user, setUser, setStats, setLessons } = useStore();
+  const { user, setUser, setStats } = useStore();
+  const lastRefresh = useRef(0);
 
   useEffect(() => {
     tg?.ready();
     tg?.expand();
-
-    // Initial login
     refreshUser(setUser, setStats);
 
-    // Refresh when Mini App becomes visible again (user returns from bot)
     const handleVisibility = () => {
       if (!document.hidden) {
-        refreshUser(setUser, setStats);
-        setLessons([]); // force lessons reload
+        const now = Date.now();
+        // 30 sekundda bir — oddiy background/foreground uchun
+        if (now - lastRefresh.current > 30000) {
+          lastRefresh.current = now;
+          refreshUser(setUser, setStats);
+        }
       }
     };
+
     document.addEventListener('visibilitychange', handleVisibility);
 
-    // Telegram specific: app activated event
     if (tg) {
+      // activated = foydalanuvchi botdan qaytdi
+      // Bu holda HAR DOIM refresh — premium holati yangilansin
       tg.onEvent('activated', () => {
+        lastRefresh.current = 0; // throttle reset
         refreshUser(setUser, setStats);
-        setLessons([]);
       });
     }
 
@@ -71,7 +74,6 @@ export default function App() {
           <Route path="/lesson/:id"  element={<Lesson />} />
           <Route path="/test/:id"    element={<LevelTest />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="/share"       element={<ShareCard />} />
           <Route path="/profile"     element={<Profile />} />
           <Route path="/premium"     element={<Premium />} />
         </Routes>
@@ -83,7 +85,7 @@ export default function App() {
 
 function Loader() {
   return (
-    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh' }}>
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', background:'#0f0f1a' }}>
       <span style={{ fontSize: 32 }}>🇰🇷</span>
     </div>
   );

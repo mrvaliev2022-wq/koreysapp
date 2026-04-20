@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useStore } from '../store';
 import { api } from '../api';
 
-const MEDAL = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49'];
+const MEDAL = ['🥇', '🥈', '🥉'];
 const TOP_COLORS = [
   { bg: 'rgba(254,243,199,0.85)', border: 'rgba(251,191,36,0.5)', num: '#b45309' },
   { bg: 'rgba(243,244,246,0.8)',  border: 'rgba(156,163,175,0.4)', num: '#4b5563' },
@@ -17,15 +17,13 @@ export default function Leaderboard() {
 
   useEffect(() => {
     setLoading(true);
-    // Faqat top 100 so'raymiz — backend limit=100 default
     api.getLeaderboard(type).then(setList).finally(() => setLoading(false));
   }, [type]);
 
-  // Top 10 va user pozitsiyasi
-  const top10  = list.slice(0, 10);
-  const myIdx  = list.findIndex(u => u.telegram_id === user?.telegram_id);
-  const myRank = myIdx >= 0 ? myIdx + 1 : 0;
-  const myUser = myIdx >= 0 ? list[myIdx] : null;
+  const top10     = list.slice(0, 10);
+  const myIdx     = list.findIndex(u => u.telegram_id === user?.telegram_id);
+  const myRank    = myIdx >= 0 ? myIdx + 1 : 0;
+  const myUser    = myIdx >= 0 ? list[myIdx] : null;
   const isInTop10 = myRank > 0 && myRank <= 10;
 
   return (
@@ -35,17 +33,15 @@ export default function Leaderboard() {
       <div style={s.content}>
         {/* Header */}
         <div style={s.header}>
-          <div style={s.title}>\uD83C\uDFC6 Reyting</div>
+          <div style={s.title}>🏆 Reyting</div>
           {myRank > 0 && (
-            <div style={s.myRankBadge}>
-              Siz: #{myRank}
-            </div>
+            <div style={s.myRankBadge}>Siz: #{myRank}</div>
           )}
         </div>
 
         {/* Tabs */}
         <div style={s.tabs}>
-          {[['daily', '\u2600\uFE0F Kunlik'], ['global', '\uD83C\uDF0D Global']].map(([val, lbl]) => (
+          {[['daily', '☀️ Kunlik'], ['global', '🌍 Global']].map(([val, lbl]) => (
             <button key={val}
               style={{ ...s.tab, ...(type === val ? s.tabActive : {}) }}
               onClick={() => setType(val)}>
@@ -58,7 +54,7 @@ export default function Leaderboard() {
           <div style={s.center}><div style={s.loader} /></div>
         ) : list.length === 0 ? (
           <div style={s.empty}>
-            <div style={s.emptyIco}>\uD83C\uDFC6</div>
+            <div style={s.emptyIco}>🏆</div>
             <div style={s.emptyTxt}>Hali hech kim yo'q</div>
             <div style={s.emptySub}>Birinchi bo'ling!</div>
           </div>
@@ -68,9 +64,9 @@ export default function Leaderboard() {
             {top10.length >= 3 && (
               <div style={s.podium}>
                 {[top10[1], top10[0], top10[2]].map((u, idx) => {
-                  const rank  = idx === 0 ? 1 : idx === 1 ? 0 : 2;
-                  const col   = TOP_COLORS[rank];
-                  const isMe  = u?.telegram_id === user?.telegram_id;
+                  const rank = idx === 0 ? 1 : idx === 1 ? 0 : 2;
+                  const col  = TOP_COLORS[rank];
+                  const isMe = u?.telegram_id === user?.telegram_id;
                   if (!u) return <div key={idx} style={{ flex: 1 }} />;
                   return (
                     <div key={rank} style={{
@@ -86,7 +82,7 @@ export default function Leaderboard() {
                       </div>
                       <div style={s.podName}>{(u.name || 'User').split(' ')[0]}</div>
                       <div style={{ ...s.podXp, color: isMe ? '#7c3aed' : col.num }}>
-                        \u26A1 {u.xp}
+                        ⚡ {u.xp}
                       </div>
                       {isMe && <div style={s.podMeBadge}>Siz</div>}
                     </div>
@@ -95,7 +91,7 @@ export default function Leaderboard() {
               </div>
             )}
 
-            {/* TOP 10 list (4-10) */}
+            {/* TOP 4-10 list */}
             <div style={s.list}>
               {top10.slice(3).map((u, i) => {
                 const rank = i + 4;
@@ -117,23 +113,20 @@ export default function Leaderboard() {
                       {isMe && <span style={s.meBadge}>Siz</span>}
                     </div>
                     <div style={{ ...s.rowXp, color: isMe ? '#7c3aed' : '#6b7280' }}>
-                      \u26A1 {u.xp}
+                      ⚡ {u.xp}
                     </div>
                   </div>
                 );
               })}
 
-              {/* Divider + User o'rni (agar top 10 da bo'lmasa) */}
+              {/* User TOP 10 dan tashqarida bo'lsa */}
               {myUser && !isInTop10 && (
                 <>
-                  {/* Divider */}
                   <div style={s.divider}>
                     <div style={s.dividerLine} />
                     <div style={s.dividerTxt}>Sizning o'rningiz</div>
                     <div style={s.dividerLine} />
                   </div>
-
-                  {/* User o'z reyting kartasi */}
                   <div style={s.mySpecialRow}>
                     <div style={s.mySpecialLeft}>
                       <div style={s.mySpecialRank}>#{myRank}</div>
@@ -142,12 +135,19 @@ export default function Leaderboard() {
                       </div>
                       <div style={s.mySpecialInfo}>
                         <div style={s.mySpecialName}>{myUser.name || 'Siz'}</div>
-                        <div style={s.mySpecialSub}>Top {myRank} ga kirish uchun harakat qiling!</div>
+                        <div style={s.mySpecialSub}>Top 10 ga kirish uchun harakat qiling!</div>
                       </div>
                     </div>
-                    <div style={s.mySpecialXp}>\u26A1 {myUser.xp}</div>
+                    <div style={s.mySpecialXp}>⚡ {myUser.xp}</div>
                   </div>
                 </>
+              )}
+
+              {/* User TOP 10 ichida — alohida eslatma */}
+              {myUser && isInTop10 && (
+                <div style={s.inTopNote}>
+                  ✅ Siz TOP 10 dasiz! #{myRank} o'rinda
+                </div>
               )}
             </div>
           </>
@@ -171,7 +171,7 @@ const s = {
   orb3: { position: 'fixed', width: 160, height: 160, borderRadius: '50%', background: 'radial-gradient(circle,rgba(167,139,250,0.2),transparent)', bottom: 180, right: -40, pointerEvents: 'none', zIndex: 0 },
   content: { position: 'relative', zIndex: 1, padding: '16px 16px 0' },
   center:  { display: 'flex', justifyContent: 'center', padding: 40 },
-  loader:  { width: 36, height: 36, borderRadius: '50%', border: '3px solid rgba(124,58,237,0.15)', borderTopColor: '#7c3aed', animation: 'spin 0.8s linear infinite' },
+  loader:  { width: 36, height: 36, borderRadius: '50%', border: '3px solid rgba(124,58,237,0.15)', borderTopColor: '#7c3aed' },
 
   header:      { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
   title:       { fontSize: 20, fontWeight: 900, color: '#1e1b4b' },
@@ -181,13 +181,13 @@ const s = {
   tab:       { flex: 1, padding: '10px 0', borderRadius: 13, background: 'rgba(255,255,255,0.6)', border: '1.5px solid rgba(124,58,237,0.12)', fontSize: 13, fontWeight: 700, cursor: 'pointer', color: '#6b7280' },
   tabActive: { background: 'linear-gradient(135deg,#7c3aed,#3b82f6)', border: 'none', color: '#fff' },
 
-  podium:     { display: 'flex', gap: 8, marginBottom: 14, alignItems: 'flex-end' },
-  podCard:    { flex: 1, borderRadius: 16, padding: '12px 8px', textAlign: 'center', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: '1.5px solid', position: 'relative', overflow: 'hidden', transition: 'transform .2s' },
-  podOrb:     { position: 'absolute', width: 55, height: 55, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,255,255,0.25),transparent)', top: -15, right: -10, pointerEvents: 'none' },
-  podMedal:   { fontSize: 22, marginBottom: 4 },
-  podAv:      { width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900, margin: '0 auto 5px' },
-  podName:    { fontSize: 10, fontWeight: 700, color: '#1e1b4b', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
-  podXp:      { fontSize: 11, fontWeight: 800 },
+  podium:   { display: 'flex', gap: 8, marginBottom: 14, alignItems: 'flex-end' },
+  podCard:  { flex: 1, borderRadius: 16, padding: '12px 8px', textAlign: 'center', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: '1.5px solid', position: 'relative', overflow: 'hidden', transition: 'transform .2s' },
+  podOrb:   { position: 'absolute', width: 55, height: 55, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,255,255,0.25),transparent)', top: -15, right: -10, pointerEvents: 'none' },
+  podMedal: { fontSize: 22, marginBottom: 4 },
+  podAv:    { width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900, margin: '0 auto 5px' },
+  podName:  { fontSize: 10, fontWeight: 700, color: '#1e1b4b', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+  podXp:    { fontSize: 11, fontWeight: 800 },
   podMeBadge: { fontSize: 8, fontWeight: 700, background: 'rgba(124,58,237,0.15)', color: '#7c3aed', padding: '2px 6px', borderRadius: 6, marginTop: 3, display: 'inline-block' },
 
   list:    { display: 'flex', flexDirection: 'column', gap: 7 },
@@ -212,6 +212,8 @@ const s = {
   mySpecialName: { fontSize: 14, fontWeight: 800, color: '#1e1b4b' },
   mySpecialSub:  { fontSize: 10, color: '#7c3aed', fontWeight: 600 },
   mySpecialXp:   { fontSize: 14, fontWeight: 900, color: '#7c3aed' },
+
+  inTopNote: { textAlign: 'center', fontSize: 12, fontWeight: 700, color: '#059669', background: 'rgba(209,250,229,0.7)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 12, padding: '10px 0', marginTop: 4 },
 
   empty:    { textAlign: 'center', padding: '40px 20px' },
   emptyIco: { fontSize: 44, marginBottom: 10 },

@@ -8,7 +8,15 @@ const XP = { lesson: 20, perfect: 30, game: 10 };
 
 // POST /api/progress/complete
 router.post('/complete', auth, async (req, res) => {
-  const { userId, lessonId, score, isPerfect } = req.body;
+  const { lessonId, score, isPerfect } = req.body;
+
+  // userId dan req.user dan olish — frontend dan emas
+  const userId = req.user?.id || req.body.userId;
+
+  // Guard: userId null bo'lsa xato qaytarmaymiz, faqat skip
+  if (!userId || !lessonId) {
+    return res.status(400).json({ error: 'userId va lessonId kerak' });
+  }
 
   const client = await db.connect();
   try {
@@ -75,22 +83,21 @@ router.post('/complete', auth, async (req, res) => {
         [userId, nextLesson.id]
       );
     }
-    // If not free and not premium — do NOT unlock. User must buy premium.
 
     await client.query('COMMIT');
 
     // Invalidate cache
-    await redis.del(`lessons:TOPIK:${userId}`);
-    await redis.del(`lessons:EPS-TOPIK:${userId}`);
+    await redis.del(`lessons:TOPIK:${userId}`).catch(() => {});
+    await redis.del(`lessons:EPS-TOPIK:${userId}`).catch(() => {});
 
     // Check badges (async, non-blocking)
-    const newBadges = await checkAndAwardBadges(userId, { isPerfect });
+    const newBadges = await checkAndAwardBadges(userId, { isPerfect }).catch(() => []);
 
     res.json({ xpGain, nextLessonId: nextLesson?.id, newBadges });
   } catch (err) {
     await client.query('ROLLBACK');
-    console.error(err);
-    res.status(500).json({ error: 'DB error' });
+    console.error('Progress complete error:', err.message);
+    res.status(500).json({ error: 'DB error: ' + err.message });
   } finally {
     client.release();
   }

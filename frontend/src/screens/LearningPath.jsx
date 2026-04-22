@@ -18,7 +18,7 @@ export default function LearningPath() {
   useEffect(() => {
     setLoading(true);
     api.getLessons(track).then(setLessons).finally(() => setLoading(false));
-  }, [track]);
+  }, [track, user?.is_premium]);
 
   if (loading) return (
     <div style={s.page}>

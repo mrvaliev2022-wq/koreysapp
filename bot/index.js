@@ -82,7 +82,7 @@ bot.start(async (ctx) => {
     "\uD83C\uDFAF Testlar va XP tizimi!\n\n" +
     "\uD83D\uDC47 Hoziroq boshlang!",
     Markup.keyboard([
-      [Markup.button.webApp('\uD83D\uDE80 Darsni davom ettirish \uD83D\uDE80', APP_URL + '/learn')],
+      [Markup.button.webApp('\uD83D\uDE80 Darsni Boshlash \uD83D\uDE80', APP_URL + '/learn')],
     ]).resize()
   );
 });

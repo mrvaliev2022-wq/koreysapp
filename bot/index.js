@@ -81,9 +81,7 @@ bot.start(async (ctx) => {
     "\uD83C\uDFC6 Reyting va streak tizimi!\n" +
     "\uD83C\uDFAF Testlar va XP tizimi!\n\n" +
     "\uD83D\uDC47 Hoziroq boshlang!",
-    Markup.keyboard([
-      [Markup.button.webApp('\uD83D\uDE80 Darsni Boshlash \uD83D\uDE80', APP_URL)],
-    ]).resize()
+    Markup.removeKeyboard()
   );
 });
 
@@ -412,4 +410,5 @@ scheduleDailyReport();
 
 process.once('SIGINT',  () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
+
 

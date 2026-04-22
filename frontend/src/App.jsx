@@ -1,4 +1,4 @@
-﻿import { lazy, Suspense, useEffect, useRef } from 'react';
+import { lazy, Suspense, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useStore } from './store';
 import { api } from './api';
@@ -15,9 +15,15 @@ const Premium      = lazy(() => import('./screens/Premium'));
 
 const tg = window.Telegram?.WebApp;
 
-async function refreshUser(setUser, setStats) {
+async function refreshUser(setUser, setStats, setLessons, prevUser) {
   try {
     const u = await api.login();
+
+    // Premium holati o'zgangan bo'lsa — lessons ni tozala (qayta yuklansin)
+    if (prevUser && prevUser.is_premium !== u?.is_premium) {
+      setLessons([]);
+    }
+
     setUser(u);
     if (u?.id) {
       const stats = await api.getStats(u.id);
@@ -29,13 +35,22 @@ async function refreshUser(setUser, setStats) {
 }
 
 export default function App() {
-  const { user, setUser, setStats } = useStore();
+  const { user, setUser, setStats, setLessons } = useStore();
   const lastRefresh = useRef(0);
+  const userRef = useRef(user);
+
+  // user o'zganda ref ni yangilaymiz
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
 
   useEffect(() => {
     tg?.ready();
     tg?.expand();
-    refreshUser(setUser, setStats);
+
+    // Birinchi yuklashda har doim lessons tozalansin
+    setLessons([]);
+    refreshUser(setUser, setStats, setLessons, userRef.current);
 
     const handleVisibility = () => {
       if (!document.hidden) {
@@ -43,7 +58,7 @@ export default function App() {
         // 30 sekundda bir — oddiy background/foreground uchun
         if (now - lastRefresh.current > 30000) {
           lastRefresh.current = now;
-          refreshUser(setUser, setStats);
+          refreshUser(setUser, setStats, setLessons, userRef.current);
         }
       }
     };
@@ -54,8 +69,8 @@ export default function App() {
       // activated = foydalanuvchi botdan qaytdi
       // Bu holda HAR DOIM refresh — premium holati yangilansin
       tg.onEvent('activated', () => {
-        lastRefresh.current = 0; // throttle reset
-        refreshUser(setUser, setStats);
+        lastRefresh.current = 0;
+        refreshUser(setUser, setStats, setLessons, userRef.current);
       });
     }
 
@@ -90,4 +105,3 @@ function Loader() {
     </div>
   );
 }
-

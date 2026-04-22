@@ -1,4 +1,4 @@
-﻿require('dotenv').config();
+require('dotenv').config();
 const { Telegraf, Markup } = require('telegraf');
 const fetch = require('node-fetch');
 
@@ -12,7 +12,6 @@ const PREMIUM_OK_MSG = "To'lovingiz muvaffaqiyatli tasdiqlandi!\n\nPremiumdan 4 
 const PREMIUM_OK_OPTS = {
   ...Markup.inlineKeyboard([
     [Markup.button.webApp('\uD83D\uDE80 Darsni boshlash', 'https://koreysapp-qql1.vercel.app/learn')],
-    [Markup.button.webApp('\uD83C\uDDF0\uD83C\uDDF7 Ilovani ochish', 'https://koreysapp-qql1.vercel.app')],
   ])
 };
 
@@ -44,15 +43,15 @@ bot.start(async (ctx) => {
   if (isAdmin(ctx)) {
     return ctx.reply(
       'Admin paneliga xush kelibsiz!\n\n' +
-      '/stats вЂ” statistika\n' +
-      '/users вЂ” oxirgi userlar\n' +
-      '/premium_list вЂ” premium userlar\n' +
-      '/payments вЂ” tolovlar\n' +
-      '/give_premium [id] [oy] вЂ” premium berish\n' +
-      '/revoke [id] вЂ” premium olish\n' +
-      '/broadcast [matn] вЂ” xabar yuborish\n' +
-      '/health вЂ” tizim holati\n' +
-      '/find [id/ism] вЂ” user topish',
+      '/stats — statistika\n' +
+      '/users — oxirgi userlar\n' +
+      '/premium_list — premium userlar\n' +
+      '/payments — tolovlar\n' +
+      '/give_premium [id] [oy] — premium berish\n' +
+      '/revoke [id] — premium olish\n' +
+      '/broadcast [matn] — xabar yuborish\n' +
+      '/health — tizim holati\n' +
+      '/find [id/ism] — user topish',
       Markup.keyboard([
         ['Statistika', 'Userlar'],
         ['Premium list', 'Tolovlar'],
@@ -83,8 +82,7 @@ bot.start(async (ctx) => {
     "\uD83C\uDFAF Testlar va XP tizimi!\n\n" +
     "\uD83D\uDC47 Hoziroq boshlang!",
     Markup.keyboard([
-      [Markup.button.webApp('\uD83C\uDDF0\uD83C\uDDF7 Kirish \uD83C\uDDF0\uD83C\uDDF7', APP_URL)],
-      [Markup.button.webApp('\uD83D\uDE80 Darsni boshlash \uD83D\uDE80', APP_URL + '/learn')],
+      [Markup.button.webApp('\uD83D\uDE80 Darsni davom ettirish \uD83D\uDE80', APP_URL + '/learn')],
     ]).resize()
   );
 });
@@ -92,15 +90,15 @@ bot.start(async (ctx) => {
 bot.command('help', adminOnly, (ctx) => {
   ctx.reply(
     'ADMIN BUYRUQLARI:\n\n' +
-    '/stats вЂ” umumiy statistika\n' +
-    '/users [N] вЂ” oxirgi N ta user\n' +
-    '/premium_list вЂ” barcha premium userlar\n' +
-    '/payments [N] вЂ” oxirgi N ta tolov\n' +
-    '/give_premium [id] [oy] вЂ” premium ber\n' +
-    '/revoke [id] вЂ” premiumni bekor qil\n' +
-    '/broadcast [matn] вЂ” hammaga xabar\n' +
-    '/health вЂ” backend holati\n' +
-    '/find [id yoki ism] вЂ” user topish'
+    '/stats — umumiy statistika\n' +
+    '/users [N] — oxirgi N ta user\n' +
+    '/premium_list — barcha premium userlar\n' +
+    '/payments [N] — oxirgi N ta tolov\n' +
+    '/give_premium [id] [oy] — premium ber\n' +
+    '/revoke [id] — premiumni bekor qil\n' +
+    '/broadcast [matn] — hammaga xabar\n' +
+    '/health — backend holati\n' +
+    '/find [id yoki ism] — user topish'
   );
 });
 
@@ -414,4 +412,3 @@ scheduleDailyReport();
 
 process.once('SIGINT',  () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
-

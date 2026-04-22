@@ -1,4 +1,4 @@
-﻿import { create } from 'zustand';
+import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export const useStore = create(
@@ -26,7 +26,9 @@ export const useStore = create(
     }),
     {
       name: 'koreysapp-store',
-      partialize: (s) => ({ user: s.user, stats: s.stats, track: s.track }),
+      // user ni persist qilmaymiz — har safar DB dan fresh olinadi
+      // Bu is_premium eski cached holat muammosini hal qiladi
+      partialize: (s) => ({ track: s.track }),
     }
   )
 );

@@ -26,9 +26,7 @@ export const useStore = create(
     }),
     {
       name: 'koreysapp-store',
-      // user ni persist qilmaymiz — har safar DB dan fresh olinadi
-      // Bu is_premium eski cached holat muammosini hal qiladi
-      partialize: (s) => ({ track: s.track }),
+      partialize: (s) => ({ user: s.user, stats: s.stats, track: s.track }),
     }
   )
 );

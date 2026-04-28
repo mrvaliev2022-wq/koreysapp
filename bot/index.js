@@ -11,7 +11,7 @@ const ADMIN_SECRET = process.env.ADMIN_SECRET || 'koreysapp_admin_2026';
 const PREMIUM_OK_MSG = "To'lovingiz muvaffaqiyatli tasdiqlandi!\n\nPremiumdan 4 oy foydalanishingiz mumkin!\nBarcha 127+ dars ochildi.\n\nYaxshi o'qishlar!";
 const PREMIUM_OK_OPTS = {
   ...Markup.inlineKeyboard([
-    [Markup.button.webApp('\uD83D\uDE80 Darsni boshlash', 'https://koreysapp-qql1.vercel.app/learn')],
+    [Markup.button.webApp('\uD83D\uDE80 Darsni boshlash', 'https://koreysapp-qql1.vercel.app')],
   ])
 };
 
@@ -410,5 +410,6 @@ scheduleDailyReport();
 
 process.once('SIGINT',  () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
+
 
 

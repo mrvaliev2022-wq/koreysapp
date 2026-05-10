@@ -264,20 +264,30 @@ bot.command('find', adminOnly, async (ctx) => {
 bot.command('broadcast', adminOnly, async (ctx) => {
   const text = ctx.message.text.split(' ').slice(1).join(' ');
   if (!text) return ctx.reply('Foydalanish: /broadcast [matn]');
-  ctx.reply('Yuborilmoqda...');
-  try {
-    const data = await apiGet('/api/stats/admin/users?limit=10000');
-    const users = data.users || [];
-    let sent = 0, failed = 0;
-    for (const user of users) {
-      try {
-        await bot.telegram.sendMessage(user.telegram_id, text);
-        sent++;
-        await new Promise(r => setTimeout(r, 50));
-      } catch (e) { failed++; }
+  ctx.reply('Yuborilmoqda... Natija keyinroq xabar qilinadi.').catch(() => {});
+  (async () => {
+    try {
+      const data = await apiGet('/api/stats/admin/users?limit=10000');
+      const users = data.users || [];
+      let sent = 0, failed = 0;
+      for (const user of users) {
+        try {
+          await bot.telegram.sendMessage(user.telegram_id, text);
+          sent++;
+          await new Promise(r => setTimeout(r, 100));
+        } catch (e) { failed++; }
+      }
+      for (const adminId of ADMIN_IDS) {
+        await bot.telegram.sendMessage(adminId,
+          'Broadcast tugadi!\nYuborildi: ' + sent + '\nXato: ' + failed
+        ).catch(() => {});
+      }
+    } catch (e) {
+      for (const adminId of ADMIN_IDS) {
+        await bot.telegram.sendMessage(adminId, 'Broadcast xato: ' + e.message).catch(() => {});
+      }
     }
-    ctx.reply('Tugadi! Yuborildi: ' + sent + ', Xato: ' + failed);
-  } catch (e) { ctx.reply('Xato: ' + e.message); }
+  })();
 });
 
 bot.hears('Broadcast', adminOnly, (ctx) => {
